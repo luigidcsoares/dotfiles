@@ -78,7 +78,7 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
 
 - Outputs:
     - NixOS configuration: system-level configs stay under `system/` and user configurations stay under `home/`.
-    - Minimal development environment (for the lua and nix code)
+    - Minimal dev environment for neovim's lua code (we install dev tools for Nix globally, as we're going to be writing Nix stuff everywhere)
 
 ``` nix
 { 
@@ -119,8 +119,7 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
       devShells.${system}.default =
         let pkgs = nixpkgs.legacyPackages.${system};
         in pkgs.mkShell {
-          buildInputs =
-            [ pkgs.git pkgs.lua-language-server pkgs.nixd pkgs.nixfmt ];
+          buildInputs = [ pkgs.git pkgs.lua-language-server ];
         };
     };
 }
@@ -144,6 +143,7 @@ The `default.nix` file also sets up some general options:
     ./shell.nix
     ./docker.nix
     ./ui.nix
+    ./dev.nix
   ]; 
 
   nix.package = pkgs.nixFlakes;
@@ -217,6 +217,14 @@ Enable dconf (required for [GTK](#user-configuration)) and configure the default
         (nerdfonts.override { fonts = [ "Iosevka" ]; })
     ];
   };
+}
+```
+
+Install global development tools (only for languages we're going to be using constantly):
+
+``` nix
+{ pkgs, ... }: {
+  environment.systemPackages = [ pkgs.nixd pkgs.nixfmt ];
 }
 ```
 

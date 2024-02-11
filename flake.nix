@@ -36,8 +36,7 @@
       devShells.${system}.default =
         let pkgs = nixpkgs.legacyPackages.${system};
         in pkgs.mkShell {
-          buildInputs =
-            [ pkgs.git pkgs.lua-language-server pkgs.nixd pkgs.nixfmt ];
+          buildInputs = [ pkgs.git pkgs.lua-language-server ];
         };
     };
 }

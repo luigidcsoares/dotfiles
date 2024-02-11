@@ -4,6 +4,7 @@
     ./shell.nix
     ./docker.nix
     ./ui.nix
+    ./dev.nix
   ]; 
 
   nix.package = pkgs.nixFlakes;
