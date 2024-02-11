@@ -6,7 +6,7 @@ require("neorg").setup({
     ["core.keybinds"] = {
       config = {
         hook = function(keybinds)
-          keybinds.remap_event(
+          keybinds.map_event(
             "norg", "n", keybinds.leader .. "o",
             "core.looking-glass.magnify-code-block"
           )
