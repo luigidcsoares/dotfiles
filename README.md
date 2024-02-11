@@ -1,0 +1,461 @@
+# NixOS WSL Configuration
+
+
+This document covers my NixOS configuration on WSL using nix flake and home manager, as well as my Neovim setup. The entire configuration is
+intended to be generated with [Neorg](https://github.com/nvim-neorg/neorg). Unfortunately, tangling and code blocks are still far from good :/
+
+The biggest issues are the following:
+
+1. [Tangling does not work with child directories](https://github.com/nvim-neorg/neorg/issues/793)
+2. [Looking glass does play well with LSP](https://github.com/nvim-neorg/neorg/discussions/811)
+3. [Looking glass with tagged blocks shifts code to the left, which causes problem](https://github.com/nvim-neorg/neorg/issues/1301)
+
+(1) is easy to circumvent: we can hack Neorg's tangle module to postprocess files named `dir1.dir2.move.file.ext` so that they are moved to
+`dir1/dir2/file.ext`. (**Warning**: as mentioned, this is a _hack_, as `on_event` is a private function and we should not be accessing it!)
+
+``` lua
+local neorg = require("neorg.core")
+local tangle_module = neorg.modules.loaded_modules["core.tangle"]
+
+local tangle_handle = tangle_module.on_event
+tangle_module.on_event = function(event)
+  tangle_handle(event)
+  vim.loop.sleep(1)
+  for _, pathname in pairs(vim.split(vim.fn.glob("*.nix"), "\n")) do
+    local action_start, action_end = pathname:find("%.move%.")
+    if action_start and action_end then
+      local dir = pathname:sub(0, action_start - 1):gsub("%.", "/")
+      local file = pathname:sub(action_end + 1)
+      vim.loop.fs_mkdir(dir, tonumber("755", 8))
+      vim.loop.fs_rename(pathname, dir .. "/" .. file)
+    end
+  end
+end
+```
+
+(3) is easy too, but cumbersome: when editing code, move the tangle tag one line up; once done, move it back to the top of the code block again.
+
+
+## Quick start
+
+
+- Follow the [NixOS-WSL](https://github.com/nix-community/NixOS-WSL) instructions
+- Clone this repository and cd into the directory:
+
+```sh
+git clone git@github.com:luigidcsoares/dotfiles <path/to/repository>
+cd dotfiles
+```
+
+- Scan [flake.nix](#flakenix) for `home-manager.users` and replace with your user name
+- Scan [home/default.nix](#homedefaultnix) for `username` and `homeDirectory` and change as appropriate
+- Scan [system/default.nix](#systemdefaultnix) for `defaultUser` and change as appropriate ([NixOS-WSL] sets the default username to `nixos`)
+
+- Rebuild your nixos system configuration:
+
+```sh
+sudo nixos-rebuild switch --flake <path/to/repository>#nixos
+```
+
+- Move `<path/to/repository>` (and anything else you need) to your new user home directory
+- Shutdown the WSL instance and open it again, now with your user by default
+- Optional) remove the old `/home/nixos/` folder
+  
+
+## NixOS configuration
+
+
+
+### Flake
+
+
+Here we define our flake for the NixOS configuration, along with a minimal development environment. 
+
+- Inputs:
+    - [nixpkgs](https://github.com/NixOS/nixpkgs/tree/nixos-unstable) is the most recent version of the repository (unstable)
+    - [nixos-wsl] is the WSL module
+    - [home-manager](https://github.com/nix-community/home-manager) is a system for managing user environments
+    - [neorg-overlay](https://github.com/nvim-neorg/nixpkgs-neorg-overlay) is used to get the newest features of [Neorg] (unstable)
+
+- Outputs:
+    - NixOS configuration: system-level configurations stay under `system/` and user configurations stay under `home/`.
+    - Minimal development environment (for the lua and nix code)
+
+``` nix
+{ 
+  description = "NixOS WSL Flake";
+
+  inputs = { 
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable"; 
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    neorg-overlay.url = "github:nvim-neorg/nixpkgs-neorg-overlay";
+  };
+
+  outputs =
+    inputs@{ nixpkgs, nixos-wsl, home-manager, neorg-overlay, ... }:
+    let system = "x86_64-linux";
+    in {
+      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          nixos-wsl.nixosModules.wsl
+          ./system
+          home-manager.nixosModules.home-manager
+          {
+            nixpkgs.overlays = [ neorg-overlay.overlays.default ];
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.luigidcsoares = import ./home;
+          }
+        ];
+      }; 
+
+      devShells.${system}.default =
+        let pkgs = nixpkgs.legacyPackages.${system};
+        in pkgs.mkShell {
+          buildInputs =
+            [ pkgs.git pkgs.lua-language-server pkgs.nixd pkgs.nixfmt ];
+        };
+    };
+}
+```
+
+
+### System configuration
+
+
+As already mentioned, all system-level configs stay under `system/`, with `system/default.nix` file simply importing the individual config files.
+The `default.nix` file also sets up some general options:
+
+- Enable nix flakes
+- Set up the correct time zone
+- Set the system's state version (**do not alter this!** check the [FAQ](https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion))
+
+``` nix
+{ pkgs, ... }: { 
+  imports = [ 
+    ./wsl.nix
+    ./shell.nix
+    ./docker.nix
+    ./ui.nix
+  ]; 
+
+  nix.package = pkgs.nixFlakes;
+  nix.extraOptions = ''
+    experimental-features = nix-command flakes
+  '';
+
+  time.timeZone = "America/Sao_Paulo";
+
+  # This value determines the NixOS release from which the default
+  # settings for stateful data, like file locations and database versions
+  # on your system were taken. It's perfectly fine and recommended to leave
+  # this value at the release version of the first install of this system.
+  # Before changing this value read the documentation for this option
+  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
+  system.stateVersion = "23.11";
+}
+```
+
+Enable WSL (which uses the [NixOS-WSL] module):
+
+``` nix
+{ pkgs, ... }: {
+  wsl = {
+    enable = true;
+    defaultUser = "luigidcsoares";
+    startMenuLaunchers = true;
+  };
+}
+```
+
+Define zsh as the default shell:
+
+``` nix
+{ pkgs, ... }: {
+  programs.zsh.enable = true;
+  environment.pathsToLink = [ "/share/zsh" ];
+  users.defaultUserShell = pkgs.zsh;
+}
+```
+
+Enable docker without root:
+
+``` nix
+{ pkgs, ... }: {
+  virtualisation.docker.rootless = {
+    enable = true;
+    setSocketVariable = true;
+  };
+}
+```
+
+Enable dconf (required for [GTK](#user-configuration)) and configure the default fonts:
+
+``` nix
+{ pkgs, ... }: {
+  programs.dconf.enable = true;
+  fonts = {
+    fontconfig = {
+      enable = true;
+      defaultFonts = {
+        monospace = [ "Iosevka Nerd Font" ];
+        serif = [ "Iosevka Etoile" ];
+        sansSerif = [ "Iosevka Aile" ];
+      };
+    };
+
+    packages = with pkgs; [
+      (iosevka-bin.override { variant = "aile"; })
+        (iosevka-bin.override { variant = "etoile"; })
+        (nerdfonts.override { fonts = [ "Iosevka" ]; })
+    ];
+  };
+}
+```
+
+
+### User configuration
+
+
+Similar to the system case, user-level configurations are also split into multiple files under `home/`. The file `home/default.nix` imports all
+modules and defines some general user-level configurations:
+
+- The user's name and home directory
+- The correct time zone
+- Home manager's state version
+
+``` nix
+{ ... }: {
+  imports = [
+    ./ui.nix
+    ./tools.nix
+    ./shell.nix
+    ./neovim.nix
+    ./zathura.nix
+  ];
+
+  home = {
+    username = "luigidcsoares";
+    homeDirectory = "/home/luigidcsoares";
+  };
+
+  # This value determines the Home Manager release that your
+  # configuration is compatible with. This helps avoid breakage
+  # when a new Home Manager release introduces backwards
+  # incompatible changes.
+  #
+  # You can update Home Manager without changing this value. See
+  # the Home Manager release notes for a list of state version
+  # changes in each release.
+  home.stateVersion = "23.11";
+
+  # Let Home Manager install and manage itself.
+  programs.home-manager.enable = true;
+}
+```
+
+Set up theme for gui apps (check [Catppuccin theme for GTK](https://github.com/catppuccin/gtk)):
+
+``` nix
+{ pkgs, ... }: {
+  gtk = {
+    enable = true;
+    theme = {
+      name = "Catppuccin-Mocha-Compact-Lavender-Dark";
+      package = pkgs.catppuccin-gtk.override {
+        accents = [ "lavender" ];
+        size = "compact";
+        tweaks = [ "rimless" ];
+        variant = "mocha";
+      };
+    };
+  };
+}
+```
+
+Set up some tools:
+
+``` nix
+{ ... }: {
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
+  programs.fzf.enable = true;
+  programs.ripgrep.enable = true;
+
+  services.ssh-agent.enable = true;
+  programs.git = {
+    enable = true;
+    userName = "Luigi D. C. Soares";
+    userEmail = "dev@luigidcsoares.com";
+  };
+}
+```
+
+Set up zsh with oh-my-zsh and powerlevel10k theme:
+
+``` nix
+{ pkgs, ... }: {
+  programs.zsh = {
+    enable = true;
+    enableAutosuggestions = true;
+    enableCompletion = true;
+    initExtra = ''
+      # Sets up Windows Terminal to duplicate tab at the same dir
+      # See https://learn.microsoft.com/en-us/windows/terminal/tutorials/new-tab-same-directory
+      keep_current_path() { 
+        printf "\e]9;9;%s\e\\" "$(wslpath -w "$PWD")" 
+      }
+      precmd_functions+=(keep_current_path)
+    '';
+    oh-my-zsh = {
+      enable = true;
+      plugins = [ "git" "fzf" ];
+    };
+    plugins = [
+      {
+        name = "powerlevel10k";
+        file = "powerlevel10k.zsh-theme";
+        src = "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k";
+      }
+      {
+        name = "powerlevel10k-config";
+        file = "p10k.zsh";
+        src = ./zsh;
+      }
+    ];
+  };
+}
+```
+
+Configure Neovim as the default editor and install plugins (see [Neovim configuration](#neovim-configuration)):
+
+``` nix
+{ pkgs, ... }: {
+  home.file.".config/nvim/after".source = ./nvim/after;
+  programs.neovim = {
+    defaultEditor = true;
+    enable = true;
+    extraLuaConfig = builtins.readFile ./nvim/options.lua;
+    plugins = let plugins = pkgs.vimPlugins;
+    in [
+      {
+        plugin = plugins.catppuccin-nvim;
+        type = "lua";
+        config = builtins.readFile ./nvim/catppuccin.lua;
+      }
+      { plugin = plugins.nvim-web-devicons; }
+      {
+        plugin = plugins.lualine-nvim;
+        type = "lua";
+        config = builtins.readFile ./nvim/lualine.lua;
+      }
+      { plugin = plugins.plenary-nvim; }
+      { plugin = plugins.telescope-file-browser-nvim; }
+      {
+        plugin = plugins.telescope-nvim;
+        type = "lua";
+        config = builtins.readFile ./nvim/telescope.lua;
+      }
+      {
+        plugin = (plugins.nvim-treesitter.withPlugins (treesitter: [
+          treesitter.elixir
+          treesitter.lua
+          treesitter.nix
+          treesitter.python
+          treesitter.vim
+          treesitter.vimdoc
+        ]));
+        type = "lua";
+        config = builtins.readFile ./nvim/treesitter.lua;
+      }
+      {
+        plugin = plugins.nvim-lspconfig;
+        type = "lua";
+        config = builtins.readFile ./nvim/lspconfig.lua;
+      }
+      {
+        plugin = plugins.neorg;
+        type = "lua";
+        config = builtins.readFile ./nvim/neorg.lua;
+      }
+      {
+        plugin = plugins.vimtex;
+        type = "lua";
+        config = builtins.readFile ./nvim/vimtex.lua;
+      }
+    ];
+  };
+}
+```
+
+Configure Zathura as the PDF reader:
+
+- Customize mappings and con
+- Configure the clipboard
+- Set up [Catppuccin theme for Zathura](https://github.com/catppuccin/zathura)
+
+``` nix
+{ ... }: {
+  programs.zathura = {
+    enable = true;
+    mappings = {
+      "H" = "scroll full-left";
+      "J" = "scroll page-bottom";
+      "K" = "scroll page-top";
+      "L" = "scroll full-right";
+      "n" = "navigate next";
+      "p" = "navigate previous";
+    };
+    options = {
+      selection-clipboard = "clipboard";
+      recolor = true;
+      recolor-keephue = true;
+      # Catppuccin Mocha (see https://github.com/catppuccin/zathura)
+      default-fg = "#CDD6F4";
+      default-bg = "#1E1E2E";
+      completion-bg = "#313244";
+      completion-fg = "#CDD6F4";
+      completion-highlight-bg = "#575268";
+      completion-highlight-fg = "#CDD6F4";
+      completion-group-bg = "#313244";
+      completion-group-fg = "#89B4FA";
+      statusbar-fg = "#CDD6F4";
+      statusbar-bg = "#313244";
+      notification-bg = "#313244";
+      notification-fg = "#CDD6F4";
+      notification-error-bg = "#313244";
+      notification-error-fg = "#F38BA8";
+      notification-warning-bg = "#313244";
+      notification-warning-fg = "#FAE3B0";
+      inputbar-fg = "#CDD6F4";
+      inputbar-bg = "#313244";
+      recolor-lightcolor = "#1E1E2E";
+      recolor-darkcolor = "#CDD6F4";
+      index-fg = "#CDD6F4";
+      index-bg = "#1E1E2E";
+      index-active-fg = "#CDD6F4";
+      index-active-bg = "#313244";
+      render-loading-bg = "#1E1E2E";
+      render-loading-fg = "#CDD6F4";
+      highlight-color = "#575268";
+      highlight-fg = "#F5C2E7";
+      highlight-active-color = "#F5C2E7";
+    };
+  };
+}
+```
+
+
+## Neovim configuration
+

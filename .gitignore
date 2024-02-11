@@ -1,0 +1,25 @@
+# Ignore everything but .gitignore by default, and whitelist as needed
+*
+!.gitignore
+
+# Docs
+!README.*
+
+# Flake
+!flake.*
+
+# Project config
+!.luarc.json
+!.nixd.json
+!.nvim.lua
+
+# NixOS user configuration
+!home/
+!home/**/
+!home/**/*.lua
+!home/**/*.nix
+!home/**/*.zsh
+
+# NixOS system configuration
+!system/
+!system/**/*.nix
