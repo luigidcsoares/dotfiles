@@ -380,8 +380,12 @@ Let's start with `home/neovim.nix`:
 ```
 
 Then, we define the Neovim's overlay. One decision is worth mentioning: `myNeovimUtils.defaultPlugins` is an attribute set of the form 
-`\{ nvim-lspconfig = <<nvim-lspconfig plugin>>; neorg: <<neorg plugin>>; ... \}`. This helps us to replace plugins in project-specific
-configurations. For example, when working on Neorg locally, we can run
+
+```nix 
+{ nvim-lspconfig = <<nvim-lspconfig plugin>>; neorg: <<neorg plugin>>; ... }
+```
+
+This helps us to replace plugins in project-specific configurations. For example, when working on Neorg locally, we can run
 
 ```nix
 myNeovimUtils.defaultPlugins // (myNeovimUtils.makePluginAttrSet [ neorg-local ]);
