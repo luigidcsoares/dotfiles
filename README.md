@@ -388,7 +388,10 @@ Then, we define the Neovim's overlay. One decision is worth mentioning: `myNeovi
 This helps us to replace plugins in project-specific configurations. For example, when working on Neorg locally, we can run
 
 ```nix
-myNeovimUtils.defaultPlugins // (myNeovimUtils.makePluginAttrSet [ neorg-local ]);
+let
+  customPlugins = myNeovimUtils.defaultPlugins // (myNeovimUtils.makePluginAttrSet [ neorg-local ]);
+  neovimConfig = myNeovimUtils.makeConfig customPlugins;
+in myNeovimUtils.wrapNeovim neovimConfig
 ```
 
 The overlays is defined as follows:

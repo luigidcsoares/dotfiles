@@ -390,7 +390,10 @@
     This helps us to replace plugins in project-specific configurations. For example, when working on Neorg locally, we can run
 
     @code nix
-    myNeovimUtils.defaultPlugins // (myNeovimUtils.makePluginAttrSet [ neorg-local ]);
+    let
+      customPlugins = myNeovimUtils.defaultPlugins // (myNeovimUtils.makePluginAttrSet [ neorg-local ]);
+      neovimConfig = myNeovimUtils.makeConfig customPlugins;
+    in myNeovimUtils.wrapNeovim neovimConfig
     @end
 
     The overlays is defined as follows:
