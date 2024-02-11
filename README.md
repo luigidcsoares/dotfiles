@@ -10,16 +10,13 @@ The biggest issues are the following:
 2. [Looking glass does play well with LSP](https://github.com/nvim-neorg/neorg/discussions/811)
 3. [Looking glass with tagged blocks shifts code to the left, which causes problem](https://github.com/nvim-neorg/neorg/issues/1301)
 
-(1) is easy to circumvent: we can hack Neorg's tangle module to postprocess files named `dir1.dir2.move.file.ext` so that they are moved to
-`dir1/dir2/file.ext`. (**Warning**: as mentioned, this is a _hack_, as `on_event` is a private function and we should not be accessing it!)
+(1) is easy to circumvent: we can create a Neovim command `NixOS` to postprocess files named `dir1.dir2.move.file.ext` so that they are moved to
+`dir1/dir2/file.ext`. This command also tangles the de code blocks and exports this document to markdown.
 
 ``` lua
-local neorg = require("neorg.core")
-local tangle_module = neorg.modules.loaded_modules["core.tangle"]
-local tangle_handle = tangle_module.on_event
-tangle_module.on_event = function(event)
-  tangle_handle(event)
-  vim.loop.sleep(1)
+vim.api.nvim_create_user_command("NixOS", function()
+  vim.cmd("Neorg tangle current-file")
+  vim.cmd("Neorg export to-file README.md")
   for _, pathname in pairs(vim.split(vim.fn.glob("*.nix"), "\n")) do
     local action_start, action_end = pathname:find("%.move%.")
     if action_start and action_end then
@@ -29,7 +26,7 @@ tangle_module.on_event = function(event)
       vim.loop.fs_rename(pathname, dir .. "/" .. file)
     end
   end
-end
+end, {})
 ```
 
 (3) is easy too, but cumbersome: when editing code, move the tangle tag one line up; once done, move it back to the top of the code block again.

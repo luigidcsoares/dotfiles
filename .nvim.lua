@@ -1,9 +1,6 @@
-local neorg = require("neorg.core")
-local tangle_module = neorg.modules.loaded_modules["core.tangle"]
-local tangle_handle = tangle_module.on_event
-tangle_module.on_event = function(event)
-  tangle_handle(event)
-  vim.loop.sleep(1)
+vim.api.nvim_create_user_command("NixOS", function()
+  vim.cmd("Neorg tangle current-file")
+  vim.cmd("Neorg export to-file README.md")
   for _, pathname in pairs(vim.split(vim.fn.glob("*.nix"), "\n")) do
     local action_start, action_end = pathname:find("%.move%.")
     if action_start and action_end then
@@ -13,4 +10,4 @@ tangle_module.on_event = function(event)
       vim.loop.fs_rename(pathname, dir .. "/" .. file)
     end
   end
-end
+end, {})
