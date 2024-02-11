@@ -73,12 +73,12 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
 
 - Inputs:
     - [nixpkgs](https://github.com/NixOS/nixpkgs/tree/nixos-unstable) is the most recent version of the repository (unstable)
-    - [nixos-wsl] is the WSL module
+    - [nixos-wsl](https://github.com/nix-community/NixOS-WSL) is the WSL module
     - [home-manager](https://github.com/nix-community/home-manager) is a system for managing user environments
     - [neorg-overlay](https://github.com/nvim-neorg/nixpkgs-neorg-overlay) is used to get the newest features of [Neorg] (unstable)
 
 - Outputs:
-    - NixOS configuration: system-level configurations stay under `system/` and user configurations stay under `home/`.
+    - NixOS configuration: system-level configs stay under `system/` and user configurations stay under `home/`.
     - Minimal development environment (for the lua and nix code)
 
 ``` nix
@@ -164,7 +164,7 @@ The `default.nix` file also sets up some general options:
 }
 ```
 
-Enable WSL (which uses the [NixOS-WSL] module):
+Enable WSL (which uses the [NixOS-WSL](https://github.com/nix-community/NixOS-WSL) module):
 
 ``` nix
 { pkgs, ... }: {
