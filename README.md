@@ -77,12 +77,15 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
     - NixOS configuration: system-level configs stay under `system/` and user configurations stay under `home/`.
     - Minimal dev environment for neovim's lua code (we install dev tools for Nix globally, as we're going to be writing Nix stuff everywhere)
 
+The user config (home manager) includes a Neovim overlay that wraps it with the plugins we are going to use by default. We could just use
+home-manager neovim.plugins' option, but this approach allows us to reuse this overlay in other projects as a starting point.
+
 ``` nix
-{ 
+{
   description = "NixOS WSL Flake";
 
-  inputs = { 
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable"; 
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -95,9 +98,11 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
   };
 
   outputs =
-    inputs@{ nixpkgs, nixos-wsl, home-manager, neorg-overlay, ... }:
+    { self, nixpkgs, nixos-wsl, home-manager, neorg-overlay, ... }:
     let system = "x86_64-linux";
     in {
+      neovim-overlay = import overlays/neovim.nix;
+
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
@@ -105,13 +110,14 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
           ./system
           home-manager.nixosModules.home-manager
           {
-            nixpkgs.overlays = [ neorg-overlay.overlays.default ];
+            nixpkgs.overlays =
+              [ self.neovim-overlay neorg-overlay.overlays.default ];
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.luigidcsoares = import ./home;
           }
         ];
-      }; 
+      };
 
       devShells.${system}.default =
         let pkgs = nixpkgs.legacyPackages.${system};
@@ -342,64 +348,94 @@ Set up zsh with oh-my-zsh and powerlevel10k theme:
 }
 ```
 
-Configure Neovim as the default editor and install plugins (see [Neovim configuration](#neovim-configuration)):
+Configure Neovim as the default editor and install plugins (see [Neovim configuration](#neovim-configuration)). This step requires two files:
+
+- `home/neovim.nix`: configures the Neovim package that we're going to use
+- `overlays/neovim.nix`: defines an overlay with the Neovim package wrapped with default plugins and some helper function for later use
+
+Let's start with `home/neovim.nix`:
 
 ``` nix
 { pkgs, ... }: {
-  home.file.".config/nvim/after".source = ./nvim/after;
   programs.neovim = {
+    enable = false;
     defaultEditor = true;
-    enable = true;
-    extraLuaConfig = builtins.readFile ./nvim/options.lua;
-    plugins = let plugins = pkgs.vimPlugins;
-    in [
-      {
-        plugin = plugins.catppuccin-nvim;
-        type = "lua";
-        config = builtins.readFile ./nvim/catppuccin.lua;
-      }
-      { plugin = plugins.nvim-web-devicons; }
-      {
-        plugin = plugins.lualine-nvim;
-        type = "lua";
-        config = builtins.readFile ./nvim/lualine.lua;
-      }
-      { plugin = plugins.plenary-nvim; }
-      { plugin = plugins.telescope-file-browser-nvim; }
-      {
-        plugin = plugins.telescope-nvim;
-        type = "lua";
-        config = builtins.readFile ./nvim/telescope.lua;
-      }
-      {
-        plugin = (plugins.nvim-treesitter.withPlugins (treesitter: [
-          treesitter.elixir
-          treesitter.lua
-          treesitter.nix
-          treesitter.python
-          treesitter.vim
-          treesitter.vimdoc
-        ]));
-        type = "lua";
-        config = builtins.readFile ./nvim/treesitter.lua;
-      }
-      {
-        plugin = plugins.nvim-lspconfig;
-        type = "lua";
-        config = builtins.readFile ./nvim/lspconfig.lua;
-      }
-      {
-        plugin = plugins.neorg;
-        type = "lua";
-        config = builtins.readFile ./nvim/neorg.lua;
-      }
-      {
-        plugin = plugins.vimtex;
-        type = "lua";
-        config = builtins.readFile ./nvim/vimtex.lua;
-      }
-    ];
   };
+
+  home.packages = [ pkgs.my-neovim ];
+  home.file = {
+    ".config/nvim/after".source = ./nvim/after;
+    ".config/nvim/init.lua".text = ''
+      ${builtins.readFile ./nvim/options.lua}
+      ${builtins.readFile ./nvim/catppuccin.lua}
+      ${builtins.readFile ./nvim/lualine.lua}
+      ${builtins.readFile ./nvim/telescope.lua}
+      ${builtins.readFile ./nvim/treesitter.lua}
+      ${builtins.readFile ./nvim/lspconfig.lua}
+      ${builtins.readFile ./nvim/neorg.lua}
+      ${builtins.readFile ./nvim/vimtex.lua}
+    '';
+  };
+}
+```
+
+Then, we define the Neovim's overlay. One decision is worth mentioning: `myNeovimUtils.defaultPlugins` is an attribute set of the form 
+`\{ nvim-lspconfig = <<nvim-lspconfig plugin>>; neorg: <<neorg plugin>>; ... \}`. This helps us to replace plugins in project-specific
+configurations. For example, when working on Neorg locally, we can run
+
+```nix
+myNeovimUtils.defaultPlugins // (myNeovimUtils.makePluginAttrSet [ neorg-local ]);
+```
+
+The overlays is defined as follows:
+
+``` nix
+final: prev:
+let
+  pluginWithName = plugin: {
+    name = plugin.pname;
+    value = plugin;
+  };
+
+  makePluginAttrSet = plugins:
+    builtins.listToAttrs (map pluginWithName plugins);
+
+  normalizePlugin = plugin: { inherit plugin; };
+  makeConfig = pluginsAttrSet:
+    prev.neovimUtils.makeNeovimConfig {
+      plugins =
+        map normalizePlugin (builtins.attrValues pluginsAttrSet);
+    };
+
+  wrapNeovim = config:
+    prev.wrapNeovimUnstable prev.neovim-unwrapped
+    (config // { wrapRc = false; });
+
+  plugins = final.vimPlugins;
+  defaultPlugins = makePluginAttrSet [
+    plugins.catppuccin-nvim
+    plugins.nvim-web-devicons
+    plugins.lualine-nvim
+    plugins.plenary-nvim
+    plugins.telescope-nvim
+    plugins.telescope-file-browser-nvim
+    (plugins.nvim-treesitter.withPlugins (treesitter: [
+      treesitter.elixir
+      treesitter.lua
+      treesitter.nix
+      treesitter.python
+      treesitter.vim
+      treesitter.vimdoc
+    ]))
+    plugins.nvim-lspconfig
+    plugins.neorg
+    plugins.vimtex
+  ];
+in {
+  myNeovimUtils = {
+    inherit makePluginAttrSet makeConfig wrapNeovim defaultPlugins;
+  };
+  my-neovim = wrapNeovim (makeConfig defaultPlugins);
 }
 ```
 

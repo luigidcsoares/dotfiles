@@ -23,3 +23,7 @@
 # NixOS system configuration
 !system/
 !system/**/*.nix
+
+# My custom overlays
+!overlays/
+!overlays/**/*.nix
