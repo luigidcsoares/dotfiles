@@ -11,7 +11,7 @@ The biggest issues are the following:
 3. [Looking glass with tagged blocks shifts code to the left, which causes problem](https://github.com/nvim-neorg/neorg/issues/1301)
 
 (1) is easy to circumvent: we can create a Neovim command `NixOS` to postprocess files named `dir1.dir2.move.file.ext` so that they are moved to
-`dir1/dir2/file.ext`. This command also tangles the de code blocks and exports this document to markdown.
+`dir1/dir2/file.ext`. This command also tangles the code blocks and exports this document to markdown.
 
 ``` lua
 vim.api.nvim_create_user_command("NixOS", function()
