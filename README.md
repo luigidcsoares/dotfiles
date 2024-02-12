@@ -74,11 +74,11 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
     - [neorg-overlay](https://github.com/nvim-neorg/nixpkgs-neorg-overlay) is used to get the newest features of [Neorg] (unstable)
 
 - Outputs:
-    - NixOS configuration: system-level configs stay under `system/` and user configurations stay under `home/`.
+    - Neovim overlay that wraps it with the plugins we are going to use by default (we could just use home-manager neovim.plugins' option, but this
+      approach allows us to reuse this overlay in other projects as a starting point)
+    - NixOS configuration: system-level configs stay under `system/` and user configurations stay under `home/`
     - Minimal dev environment for neovim's lua code (we install dev tools for Nix globally, as we're going to be writing Nix stuff everywhere)
-
-The user config (home manager) includes a Neovim overlay that wraps it with the plugins we are going to use by default. We could just use
-home-manager neovim.plugins' option, but this approach allows us to reuse this overlay in other projects as a starting point.
+    - Flake templates, which are stored under `templates/` (**TODO**)
 
 ``` nix
 {

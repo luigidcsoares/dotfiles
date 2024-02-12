@@ -68,17 +68,17 @@
     -- [neorg-overlay]{https://github.com/nvim-neorg/nixpkgs-neorg-overlay} is used to get the newest features of [Neorg] (unstable)
 
     - Outputs:
-    -- NixOS configuration: system-level configs stay under `system/` and user configurations stay under `home/`.
+    -- Neovim overlay that wraps it with the plugins we are going to use by default (we could just use home-manager neovim.plugins' option, but this
+       approach allows us to reuse this overlay in other projects as a starting point)
+    -- NixOS configuration: system-level configs stay under `system/` and user configurations stay under `home/`
     -- Minimal dev environment for neovim's lua code (we install dev tools for Nix globally, as we're going to be writing Nix stuff everywhere)
-
-    The user config (home manager) includes a Neovim overlay that wraps it with the plugins we are going to use by default. We could just use
-    home-manager neovim.plugins' option, but this approach allows us to reuse this overlay in other projects as a starting point.
+    -- Flake templates, which are stored under `templates/` (*TODO*)
 
     #tangle flake.nix
     @code nix
     {
       description = "NixOS WSL Flake";
-
+    
       inputs = {
         nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
         nixos-wsl = {
@@ -91,13 +91,13 @@
         };
         neorg-overlay.url = "github:nvim-neorg/nixpkgs-neorg-overlay";
       };
-
+    
       outputs =
         { self, nixpkgs, nixos-wsl, home-manager, neorg-overlay, ... }:
         let system = "x86_64-linux";
         in {
           neovim-overlay = import overlays/neovim.nix;
-
+    
           nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
             inherit system;
             modules = [
@@ -113,7 +113,7 @@
               }
             ];
           };
-
+    
           devShells.${system}.default =
             let pkgs = nixpkgs.legacyPackages.${system};
             in pkgs.mkShell {
