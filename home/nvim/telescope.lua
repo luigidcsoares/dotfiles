@@ -1,7 +1,9 @@
 local telescope = require("telescope")
 local builtin = require("telescope.builtin")
 
-telescope.setup({})
+telescope.setup({
+  extensions = { file_browser = { hijack_netrw = true } }
+})
 
 -- Telescope mappings
 vim.keymap.set("n", "<Leader>ff", builtin.find_files, {})
@@ -17,3 +19,4 @@ vim.keymap.set(
   ":Telescope file_browser path=%:p:h select_buffer=true<CR>",
   {}
 )
+
