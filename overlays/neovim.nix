@@ -1,3 +1,4 @@
+# overlays/neovim.nix
 final: prev:
 let
   neovimDefaultPlugins = let plugins = final.vimPlugins;

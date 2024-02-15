@@ -1,3 +1,4 @@
+# home/neovim.nix
 { pkgs, ... }: {
   programs.neovim = {
     enable = false;

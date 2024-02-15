@@ -1,3 +1,4 @@
+# home/tools.nix
 { ... }: {
   programs.direnv = {
     enable = true;

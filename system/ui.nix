@@ -1,3 +1,4 @@
+# system/ui.nix
 { pkgs, ... }: {
   programs.dconf.enable = true;
   fonts = {

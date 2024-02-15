@@ -1,3 +1,4 @@
+# flake.nix
 {
   description = "NixOS WSL Flake";
 

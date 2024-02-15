@@ -1,3 +1,4 @@
+# home/shell.nix
 { pkgs, ... }: {
   programs.zsh = {
     enable = true;

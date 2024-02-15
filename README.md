@@ -14,17 +14,16 @@ The biggest issues are the following:
 `dir1/dir2/file.ext`. This command also tangles the code blocks and exports this document to markdown.
 
 ``` lua
+-- .nvim.lua
 vim.api.nvim_create_user_command("NixOS", function()
   vim.cmd("Neorg tangle current-file")
   vim.cmd("Neorg export to-file README.md")
-  for _, pathname in pairs(vim.split(vim.fn.glob("*.nix"), "\n")) do
+  for _, pathname in pairs(vim.split(vim.fn.glob("*.move.*"), "\n")) do
     local action_start, action_end = pathname:find("%.move%.")
-    if action_start and action_end then
-      local dir = pathname:sub(0, action_start - 1):gsub("%.", "/")
-      local file = pathname:sub(action_end + 1)
-      vim.loop.fs_mkdir(dir, tonumber("755", 8))
-      vim.loop.fs_rename(pathname, dir .. "/" .. file)
-    end
+    local dir = pathname:sub(0, action_start - 1):gsub("%.", "/")
+    local file = pathname:sub(action_end + 1)
+    vim.loop.fs_mkdir(dir, tonumber("755", 8))
+    vim.loop.fs_rename(pathname, dir .. "/" .. file)
   end
 end, {})
 ```
@@ -81,6 +80,7 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
     - Flake templates, which are stored under `templates/` (**TODO**)
 
 ``` nix
+# flake.nix
 {
   description = "NixOS WSL Flake";
 
@@ -140,6 +140,7 @@ The `default.nix` file also sets up some general options:
 - Set the system's state version (**do not alter this!** check the [FAQ](https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion))
 
 ``` nix
+# system/default.nix
 { pkgs, ... }: { 
   imports = [ 
     ./wsl.nix
@@ -169,6 +170,7 @@ The `default.nix` file also sets up some general options:
 Enable WSL (which uses the [NixOS-WSL](https://github.com/nix-community/NixOS-WSL) module):
 
 ``` nix
+# system/wsl.nix
 { pkgs, ... }: {
   wsl = {
     enable = true;
@@ -181,6 +183,7 @@ Enable WSL (which uses the [NixOS-WSL](https://github.com/nix-community/NixOS-WS
 Define zsh as the default shell:
 
 ``` nix
+# system/shell.nix
 { pkgs, ... }: {
   programs.zsh.enable = true;
   environment.pathsToLink = [ "/share/zsh" ];
@@ -191,6 +194,7 @@ Define zsh as the default shell:
 Enable docker without root:
 
 ``` nix
+# system/docker.nix
 { pkgs, ... }: {
   virtualisation.docker.rootless = {
     enable = true;
@@ -202,6 +206,7 @@ Enable docker without root:
 Enable dconf (required for [GTK](#user-configuration)) and configure the default fonts:
 
 ``` nix
+# system/ui.nix
 { pkgs, ... }: {
   programs.dconf.enable = true;
   fonts = {
@@ -226,6 +231,7 @@ Enable dconf (required for [GTK](#user-configuration)) and configure the default
 Install global development tools (only for languages we're going to be using constantly):
 
 ``` nix
+# system/dev.nix
 { pkgs, ... }: {
   environment.systemPackages = [ pkgs.nixd pkgs.nixfmt ];
 }
@@ -243,6 +249,7 @@ modules and defines some general user-level configurations:
 - Home manager's state version
 
 ``` nix
+# home/default.nix
 { ... }: {
   imports = [
     ./ui.nix
@@ -275,6 +282,7 @@ modules and defines some general user-level configurations:
 Set up theme for gui apps (check [Catppuccin theme for GTK](https://github.com/catppuccin/gtk)):
 
 ``` nix
+# home/ui.nix
 { pkgs, ... }: {
   gtk = {
     enable = true;
@@ -294,6 +302,7 @@ Set up theme for gui apps (check [Catppuccin theme for GTK](https://github.com/c
 Set up some tools:
 
 ``` nix
+# home/tools.nix
 { ... }: {
   programs.direnv = {
     enable = true;
@@ -315,6 +324,7 @@ Set up some tools:
 Set up zsh with oh-my-zsh and powerlevel10k theme:
 
 ``` nix
+# home/shell.nix
 { pkgs, ... }: {
   programs.zsh = {
     enable = true;
@@ -356,6 +366,7 @@ Configure Neovim as the default editor and install plugins (see [Neovim configur
 Let's start with `home/neovim.nix`:
 
 ``` nix
+# home/neovim.nix
 { pkgs, ... }: {
   programs.neovim = {
     enable = false;
@@ -382,6 +393,7 @@ Let's start with `home/neovim.nix`:
 Then, we define the Neovim's overlay:
 
 ``` nix
+# overlays/neovim.nix
 final: prev:
 let
   neovimDefaultPlugins = let plugins = final.vimPlugins;
@@ -452,6 +464,7 @@ Finally, we configure Zathura as the PDF reader:
 - Set up [Catppuccin theme for Zathura](https://github.com/catppuccin/zathura)
 
 ``` nix
+# home/zathura.nix
 { ... }: {
   programs.zathura = {
     enable = true;
@@ -505,3 +518,48 @@ Finally, we configure Zathura as the PDF reader:
 
 ## Neovim configuration
 
+
+This Neovim configuration is written in [Lua](https://www.lua.org/), and it's stored in `home/nvim/`. Let's start with some general options:
+
+``` lua
+-- home/nvim/options.lua
+-- Enable project local configuration
+vim.opt.exrc = true
+
+-- Default indentation options
+vim.opt.expandtab = true
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
+
+-- Default keymap options
+vim.g.mapleader = " "
+
+-- Default UI options
+vim.opt.number = true
+vim.opt.splitbelow = true
+vim.opt.splitright = true
+vim.opt.textwidth = 72
+vim.opt.termguicolors = true
+vim.opt.concealcursor = ""
+vim.opt.conceallevel = 2
+vim.opt.foldlevel = 99
+
+-- Sets up clipboard
+vim.opt.clipboard = "unnamedplus"
+vim.g.clipboard = {
+  name = "WSLClipboard",
+  copy = {
+    ["+"] = "clip.exe",
+    ["*"] = "clip.exe"
+  },
+  paste = {
+    ["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+    ["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+  },
+  cache_enabled = 0
+}
+
+-- Show replace result in split window
+vim.opt.inccommand = "split"
+```

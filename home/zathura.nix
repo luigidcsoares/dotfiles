@@ -1,3 +1,4 @@
+# home/zathura.nix
 { ... }: {
   programs.zathura = {
     enable = true;

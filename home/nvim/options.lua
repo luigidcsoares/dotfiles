@@ -1,3 +1,4 @@
+-- home/nvim/options.lua
 -- Enable project local configuration
 vim.opt.exrc = true
 

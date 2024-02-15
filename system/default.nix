@@ -1,3 +1,4 @@
+# system/default.nix
 { pkgs, ... }: { 
   imports = [ 
     ./wsl.nix

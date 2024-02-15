@@ -1,3 +1,4 @@
+# home/ui.nix
 { pkgs, ... }: {
   gtk = {
     enable = true;

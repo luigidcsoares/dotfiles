@@ -14,17 +14,16 @@
 
   #tangle .nvim.lua
   @code lua
+  -- .nvim.lua
   vim.api.nvim_create_user_command("NixOS", function()
     vim.cmd("Neorg tangle current-file")
     vim.cmd("Neorg export to-file README.md")
-    for _, pathname in pairs(vim.split(vim.fn.glob("*.nix"), "\n")) do
+    for _, pathname in pairs(vim.split(vim.fn.glob("*.move.*"), "\n")) do
       local action_start, action_end = pathname:find("%.move%.")
-      if action_start and action_end then
-        local dir = pathname:sub(0, action_start - 1):gsub("%.", "/")
-        local file = pathname:sub(action_end + 1)
-        vim.loop.fs_mkdir(dir, tonumber("755", 8))
-        vim.loop.fs_rename(pathname, dir .. "/" .. file)
-      end
+      local dir = pathname:sub(0, action_start - 1):gsub("%.", "/")
+      local file = pathname:sub(action_end + 1)
+      vim.loop.fs_mkdir(dir, tonumber("755", 8))
+      vim.loop.fs_rename(pathname, dir .. "/" .. file)
     end
   end, {})
   @end
@@ -76,6 +75,7 @@
 
     #tangle flake.nix
     @code nix
+    # flake.nix
     {
       description = "NixOS WSL Flake";
     
@@ -134,6 +134,7 @@
 
     #tangle system.move.default.nix
     @code nix
+    # system/default.nix
     { pkgs, ... }: { 
       imports = [ 
         ./wsl.nix
@@ -164,6 +165,7 @@
 
     #tangle system.move.wsl.nix
     @code nix
+    # system/wsl.nix
     { pkgs, ... }: {
       wsl = {
         enable = true;
@@ -177,6 +179,7 @@
  
     #tangle system.move.shell.nix
     @code nix
+    # system/shell.nix
     { pkgs, ... }: {
       programs.zsh.enable = true;
       environment.pathsToLink = [ "/share/zsh" ];
@@ -188,6 +191,7 @@
  
     #tangle system.move.docker.nix
     @code nix
+    # system/docker.nix
     { pkgs, ... }: {
       virtualisation.docker.rootless = {
         enable = true;
@@ -200,6 +204,7 @@
  
     #tangle system.move.ui.nix
     @code nix
+    # system/ui.nix
     { pkgs, ... }: {
       programs.dconf.enable = true;
       fonts = {
@@ -225,6 +230,7 @@
 
     #tangle system.move.dev.nix
     @code nix
+    # system/dev.nix
     { pkgs, ... }: {
       environment.systemPackages = [ pkgs.nixd pkgs.nixfmt ];
     }
@@ -241,6 +247,7 @@
 
     #tangle home.move.default.nix
     @code nix
+    # home/default.nix
     { ... }: {
       imports = [
         ./ui.nix
@@ -274,6 +281,7 @@
 
     #tangle home.move.ui.nix
     @code nix
+    # home/ui.nix
     { pkgs, ... }: {
       gtk = {
         enable = true;
@@ -294,6 +302,7 @@
 
     #tangle home.move.tools.nix
     @code nix
+    # home/tools.nix
     { ... }: {
       programs.direnv = {
         enable = true;
@@ -316,6 +325,7 @@
 
     #tangle home.move.shell.nix
     @code nix
+    # home/shell.nix
     { pkgs, ... }: {
       programs.zsh = {
         enable = true;
@@ -358,6 +368,7 @@
 
     #tangle home.move.neovim.nix
     @code nix
+    # home/neovim.nix
     { pkgs, ... }: {
       programs.neovim = {
         enable = false;
@@ -385,6 +396,7 @@
 
     #tangle overlays.move.neovim.nix
     @code nix
+    # overlays/neovim.nix
     final: prev:
     let
       neovimDefaultPlugins = let plugins = final.vimPlugins;
@@ -456,6 +468,7 @@
 
     #tangle home.move.zathura.nix
     @code nix
+    # home/zathura.nix
     { ... }: {
       programs.zathura = {
         enable = true;
@@ -507,3 +520,49 @@
     @end
 
 ** Neovim configuration
+
+   This Neovim configuration is written in [Lua]{https://www.lua.org/}, and it's stored in `home/nvim/`. Let's start with some general options:
+
+   #tangle home.nvim.move.options.lua
+   @code lua
+   -- home/nvim/options.lua
+   -- Enable project local configuration
+   vim.opt.exrc = true
+   
+   -- Default indentation options
+   vim.opt.expandtab = true
+   vim.opt.tabstop = 2
+   vim.opt.softtabstop = 2
+   vim.opt.shiftwidth = 2
+   
+   -- Default keymap options
+   vim.g.mapleader = " "
+   
+   -- Default UI options
+   vim.opt.number = true
+   vim.opt.splitbelow = true
+   vim.opt.splitright = true
+   vim.opt.textwidth = 72
+   vim.opt.termguicolors = true
+   vim.opt.concealcursor = ""
+   vim.opt.conceallevel = 2
+   vim.opt.foldlevel = 99
+   
+   -- Sets up clipboard
+   vim.opt.clipboard = "unnamedplus"
+   vim.g.clipboard = {
+     name = "WSLClipboard",
+     copy = {
+       ["+"] = "clip.exe",
+       ["*"] = "clip.exe"
+     },
+     paste = {
+       ["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+       ["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+     },
+     cache_enabled = 0
+   }
+   
+   -- Show replace result in split window
+   vim.opt.inccommand = "split"
+   @end

@@ -1,3 +1,4 @@
+# system/wsl.nix
 { pkgs, ... }: {
   wsl = {
     enable = true;

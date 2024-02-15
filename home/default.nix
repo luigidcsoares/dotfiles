@@ -1,3 +1,4 @@
+# home/default.nix
 { ... }: {
   imports = [
     ./ui.nix
