@@ -4,7 +4,7 @@
     defaultEditor = true;
   };
 
-  home.packages = [ pkgs.my-neovim ];
+  home.packages = [ pkgs.neovim ];
   home.file = {
     ".config/nvim/after".source = ./nvim/after;
     ".config/nvim/init.lua".text = ''

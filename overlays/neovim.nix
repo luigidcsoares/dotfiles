@@ -1,47 +1,29 @@
 final: prev:
 let
-  pluginWithName = plugin: {
-    name = plugin.pname;
-    value = plugin;
-  };
-
-  makePluginAttrSet = plugins:
-    builtins.listToAttrs (map pluginWithName plugins);
-
-  normalizePlugin = plugin: { inherit plugin; };
-  makeConfig = pluginsAttrSet:
-    prev.neovimUtils.makeNeovimConfig {
-      plugins =
-        map normalizePlugin (builtins.attrValues pluginsAttrSet);
-    };
-
-  wrapNeovim = config:
-    prev.wrapNeovimUnstable prev.neovim-unwrapped
-    (config // { wrapRc = false; });
-
-  plugins = final.vimPlugins;
-  defaultPlugins = makePluginAttrSet [
+  neovimDefaultPlugins = let plugins = final.vimPlugins;
+  in [
     plugins.catppuccin-nvim
     plugins.nvim-web-devicons
     plugins.lualine-nvim
     plugins.plenary-nvim
     plugins.telescope-nvim
     plugins.telescope-file-browser-nvim
-    (plugins.nvim-treesitter.withPlugins (treesitter: [
-      treesitter.elixir
-      treesitter.lua
-      treesitter.nix
-      treesitter.python
-      treesitter.vim
-      treesitter.vimdoc
-    ]))
+    plugins.nvim-treesitter.withAllGrammars
     plugins.nvim-lspconfig
     plugins.neorg
     plugins.vimtex
   ];
+
+  neovimWithPlugins = extraPlugins:
+    let
+      normalizePlugin = plugin: { inherit plugin; };
+      plugins = neovimDefaultPlugins ++ extraPlugins;
+      config = prev.neovimUtils.makeNeovimConfig {
+        plugins = map normalizePlugin plugins;
+      };
+    in prev.wrapNeovimUnstable prev.neovim-unwrapped
+    (config // { wrapRc = false; });
 in {
-  myNeovimUtils = {
-    inherit makePluginAttrSet makeConfig wrapNeovim defaultPlugins;
-  };
-  my-neovim = wrapNeovim (makeConfig defaultPlugins);
+  inherit neovimDefaultPlugins neovimWithPlugins;
+  neovim = neovimWithPlugins [ ];
 }

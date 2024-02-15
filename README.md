@@ -99,9 +99,11 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
 
   outputs =
     { self, nixpkgs, nixos-wsl, home-manager, neorg-overlay, ... }:
-    let system = "x86_64-linux";
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
     in {
-      neovim-overlay = import overlays/neovim.nix;
+      overlays.default = import overlays/neovim.nix;
 
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         inherit system;
@@ -111,7 +113,7 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
           home-manager.nixosModules.home-manager
           {
             nixpkgs.overlays =
-              [ self.neovim-overlay neorg-overlay.overlays.default ];
+              [ self.overlays.default neorg-overlay.overlays.default ];
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.luigidcsoares = import ./home;
@@ -119,11 +121,9 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
         ];
       };
 
-      devShells.${system}.default =
-        let pkgs = nixpkgs.legacyPackages.${system};
-        in pkgs.mkShell {
-          buildInputs = [ pkgs.git pkgs.lua-language-server ];
-        };
+      devShells.${system}.default = pkgs.mkShell {
+        buildInputs = [ pkgs.git pkgs.lua-language-server ];
+      };
     };
 }
 ```
@@ -362,7 +362,7 @@ Let's start with `home/neovim.nix`:
     defaultEditor = true;
   };
 
-  home.packages = [ pkgs.my-neovim ];
+  home.packages = [ pkgs.neovim ];
   home.file = {
     ".config/nvim/after".source = ./nvim/after;
     ".config/nvim/init.lua".text = ''
@@ -379,74 +379,73 @@ Let's start with `home/neovim.nix`:
 }
 ```
 
-Then, we define the Neovim's overlay. One decision is worth mentioning: `myNeovimUtils.defaultPlugins` is an attribute set of the form 
-
-```nix 
-{ nvim-lspconfig = <<nvim-lspconfig plugin>>; neorg: <<neorg plugin>>; ... }
-```
-
-This helps us to replace plugins in project-specific configurations. For example, when working on Neorg locally, we can run
-
-```nix
-let
-  customPlugins = myNeovimUtils.defaultPlugins // (myNeovimUtils.makePluginAttrSet [ neorg-local ]);
-  neovimConfig = myNeovimUtils.makeConfig customPlugins;
-in myNeovimUtils.wrapNeovim neovimConfig
-```
-
-The overlays is defined as follows:
+Then, we define the Neovim's overlay:
 
 ``` nix
 final: prev:
 let
-  pluginWithName = plugin: {
-    name = plugin.pname;
-    value = plugin;
-  };
-
-  makePluginAttrSet = plugins:
-    builtins.listToAttrs (map pluginWithName plugins);
-
-  normalizePlugin = plugin: { inherit plugin; };
-  makeConfig = pluginsAttrSet:
-    prev.neovimUtils.makeNeovimConfig {
-      plugins =
-        map normalizePlugin (builtins.attrValues pluginsAttrSet);
-    };
-
-  wrapNeovim = config:
-    prev.wrapNeovimUnstable prev.neovim-unwrapped
-    (config // { wrapRc = false; });
-
-  plugins = final.vimPlugins;
-  defaultPlugins = makePluginAttrSet [
+  neovimDefaultPlugins = let plugins = final.vimPlugins;
+  in [
     plugins.catppuccin-nvim
     plugins.nvim-web-devicons
     plugins.lualine-nvim
     plugins.plenary-nvim
     plugins.telescope-nvim
     plugins.telescope-file-browser-nvim
-    (plugins.nvim-treesitter.withPlugins (treesitter: [
-      treesitter.elixir
-      treesitter.lua
-      treesitter.nix
-      treesitter.python
-      treesitter.vim
-      treesitter.vimdoc
-    ]))
+    plugins.nvim-treesitter.withAllGrammars
     plugins.nvim-lspconfig
     plugins.neorg
     plugins.vimtex
   ];
+
+  neovimWithPlugins = extraPlugins:
+    let
+      normalizePlugin = plugin: { inherit plugin; };
+      plugins = neovimDefaultPlugins ++ extraPlugins;
+      config = prev.neovimUtils.makeNeovimConfig {
+        plugins = map normalizePlugin plugins;
+      };
+    in prev.wrapNeovimUnstable prev.neovim-unwrapped
+    (config // { wrapRc = false; });
 in {
-  myNeovimUtils = {
-    inherit makePluginAttrSet makeConfig wrapNeovim defaultPlugins;
-  };
-  my-neovim = wrapNeovim (makeConfig defaultPlugins);
+  inherit neovimDefaultPlugins neovimWithPlugins;
+  neovim = neovimWithPlugins [ ];
 }
 ```
 
-Configure Zathura as the PDF reader:
+This helps us to replace plugins in project-specific configurations. For example, when working on Neorg locally, we can define a flake that
+overrides Neorg's version so that we can use our local version of it:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixos.url = "github:luigidcsoares/dotfiles";
+  };
+  outputs = { self, nixpkgs, nixos, ... }:
+    let
+      system = "x86_64-linux";
+      neorg-overlay = final: prev: {
+        vimPlugins = prev.vimPlugins // {
+          neorg = prev.vimUtils.buildVimPlugin {
+            pname = prev.vimPlugins.neorg.pname;
+            version = "local";
+            src = self;
+          };
+        };
+      };
+      pkgs = nixpkgs.legacyPackages.${system}.appendOverlays [
+        neorg-overlay
+        nixos.overlays.default
+      ];
+    in {
+      devShells.${system}.default =
+        pkgs.mkShell { buildInputs = [ pkgs.neovim ]; };
+    };
+}
+```
+
+Finally, we configure Zathura as the PDF reader:
 
 - Customize mappings and con
 - Configure the clipboard

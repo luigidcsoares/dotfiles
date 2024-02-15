@@ -16,9 +16,11 @@
 
   outputs =
     { self, nixpkgs, nixos-wsl, home-manager, neorg-overlay, ... }:
-    let system = "x86_64-linux";
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
     in {
-      neovim-overlay = import overlays/neovim.nix;
+      overlays.default = import overlays/neovim.nix;
 
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         inherit system;
@@ -28,7 +30,7 @@
           home-manager.nixosModules.home-manager
           {
             nixpkgs.overlays =
-              [ self.neovim-overlay neorg-overlay.overlays.default ];
+              [ self.overlays.default neorg-overlay.overlays.default ];
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.luigidcsoares = import ./home;
@@ -36,10 +38,8 @@
         ];
       };
 
-      devShells.${system}.default =
-        let pkgs = nixpkgs.legacyPackages.${system};
-        in pkgs.mkShell {
-          buildInputs = [ pkgs.git pkgs.lua-language-server ];
-        };
+      devShells.${system}.default = pkgs.mkShell {
+        buildInputs = [ pkgs.git pkgs.lua-language-server ];
+      };
     };
 }
