@@ -473,8 +473,6 @@ Finally, we configure Zathura as the PDF reader:
       "J" = "scroll page-bottom";
       "K" = "scroll page-top";
       "L" = "scroll full-right";
-      "n" = "navigate next";
-      "p" = "navigate previous";
     };
     options = {
       selection-clipboard = "clipboard";
