@@ -10,6 +10,7 @@ vim.opt.shiftwidth = 2
 
 -- Default keymap options
 vim.g.mapleader = " "
+vim.g.maplocalleader = ","
 
 -- Default UI options
 vim.opt.number = true
