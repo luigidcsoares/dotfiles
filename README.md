@@ -560,3 +560,32 @@ vim.g.clipboard = {
 -- Show replace result in split window
 vim.opt.inccommand = "split"
 ```
+
+Set up a colorscheme:
+
+``` lua
+-- home/nvim/catppuccin.lua
+require("catppuccin").setup({ flavour = "mocha" })
+vim.cmd.colorscheme("catppuccin")
+```
+
+Configure treesitter's highlight, indent and selection:
+
+``` lua
+-- home/nvim/treesitter.lua
+require("nvim-treesitter.configs").setup({
+  highlight = {
+    enable = true,
+    disable = { "latex" }
+  },
+  indent = { enable = true },
+  incremental_selection = {
+    enable = true,
+    keymaps = {
+      node_incremental = "v",
+      node_decremental = "z",
+      scope_incremental = "<Tab>",
+    }
+  }
+})
+```
