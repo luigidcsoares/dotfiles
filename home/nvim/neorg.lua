@@ -1,3 +1,4 @@
+-- home/nvim/neorg.lua
 require("neorg").setup({
   load = {
     ["core.defaults"] = {},

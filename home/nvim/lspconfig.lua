@@ -1,3 +1,4 @@
+-- home/nvim/lspconfig.lua
 local lspconfig = require("lspconfig")
 
 lspconfig.lua_ls.setup({})

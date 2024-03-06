@@ -1,3 +1,4 @@
+-- home/nvim/telescope.lua
 local telescope = require("telescope")
 local builtin = require("telescope.builtin")
 
@@ -19,4 +20,3 @@ vim.keymap.set(
   ":Telescope file_browser path=%:p:h select_buffer=true<CR>",
   {}
 )
-

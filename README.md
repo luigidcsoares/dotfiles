@@ -569,6 +569,40 @@ require("catppuccin").setup({ flavour = "mocha" })
 vim.cmd.colorscheme("catppuccin")
 ```
 
+Install lualine and configure its theme:
+
+``` lua
+-- home/nvim/lualine.lua
+require("lualine").setup({ options = { theme = "catppuccin" } })
+```
+
+Install telescope plugin and extensions:
+
+``` lua
+-- home/nvim/telescope.lua
+local telescope = require("telescope")
+local builtin = require("telescope.builtin")
+
+telescope.setup({
+  extensions = { file_browser = { hijack_netrw = true } }
+})
+
+-- Telescope mappings
+vim.keymap.set("n", "<Leader>ff", builtin.find_files, {})
+vim.keymap.set("n", "<leader>fg", builtin.live_grep, {})
+vim.keymap.set("n", "<Leader>fb", builtin.buffers, {})
+vim.keymap.set("n", "<Leader>fh", builtin.help_tags, {})
+
+-- Telescope extensions
+telescope.load_extension("file_browser")
+vim.keymap.set(
+  "n",
+  "<Leader>d", -- As in emacs "dired"
+  ":Telescope file_browser path=%:p:h select_buffer=true<CR>",
+  {}
+)
+```
+
 Configure treesitter's highlight, indent and selection:
 
 ``` lua
@@ -588,4 +622,65 @@ require("nvim-treesitter.configs").setup({
     }
   }
 })
+```
+
+Set up LSP servers:
+
+``` lua
+-- home/nvim/lspconfig.lua
+local lspconfig = require("lspconfig")
+
+lspconfig.lua_ls.setup({})
+lspconfig.nixd.setup({})
+lspconfig.pyright.setup({})
+
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+  callback = function(ev)
+    local opts = { buffer = ev.buf }
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+    vim.keymap.set("n", "<Leader>fm", vim.lsp.buf.format, opts)
+  end
+})
+```
+
+Install and configure Neorg:
+
+``` lua
+-- home/nvim/neorg.lua
+require("neorg").setup({
+  load = {
+    ["core.defaults"] = {},
+    ["core.concealer"] = {},
+    ["core.export"] = {},
+    ["core.keybinds"] = {
+      config = {
+        hook = function(keybinds)
+          keybinds.map_event(
+            "norg", "n", keybinds.leader .. "o",
+            "core.looking-glass.magnify-code-block"
+          )
+        end
+      }
+    }
+  }
+})
+```
+
+Configure LaTeX (vimtex):
+
+- Fix the path to neovim (nix only)
+- Define Zathura as the default PDF viewer
+
+``` lua
+-- home/nvim/vimtex.lua
+vim.g.vimtex_callback_progpath = vim.fn.system("which nvim")
+vim.g.vimtex_view_method = "zathura"
+```
+
+- Define specific options for Neorg files:
+
+``` lua
+-- home/nvim/after/ftplugin/norg.lua
+vim.opt.textwidth = 150
 ```
