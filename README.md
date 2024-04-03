@@ -371,6 +371,11 @@ Set up zsh with oh-my-zsh and powerlevel10k theme:
         src = ./zsh;
       }
     ];
+    shellAliases = {
+      rm = "rm -i"; 
+      rmr = "rm -ir";
+      rmrf = "rm -irf";
+    };
   };
 }
 ```

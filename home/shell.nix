@@ -28,5 +28,10 @@
         src = ./zsh;
       }
     ];
+    shellAliases = {
+      rm = "rm -i"; 
+      rmr = "rm -ir";
+      rmrf = "rm -irf";
+    };
   };
 }
