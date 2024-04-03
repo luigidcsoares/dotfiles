@@ -42,5 +42,22 @@
       devShells.${system}.default = pkgs.mkShell {
         buildInputs = [ pkgs.git pkgs.lua-language-server ];
       };
+
+
+      templates = {
+        python = {
+          path = ./templates/python;
+          description = "Python template using pure Nix packages";
+          welcomeText = ''
+            # Getting started
+            - Run `nix develop`
+
+            Optionally, you may want to automate the process with direnv:  
+
+            - Run `echo "use flake" > .envrc`  
+            - Run `direnv allow`
+          '';
+        };
+      };
     };
 }

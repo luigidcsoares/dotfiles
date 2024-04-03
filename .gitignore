@@ -27,3 +27,7 @@
 # My custom overlays
 !overlays/
 !overlays/**/*.nix
+
+# Nix flake templates
+!templates/
+!templates/**/
