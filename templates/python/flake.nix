@@ -8,10 +8,14 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      pythonEnv = pkgs.python312.withPackages
-        (pythonPkgs: [ pythonPkgs.pandas ]);
+      python = pkgs.python311;
+      pythonEnv = python.withPackages (pythonPkgs: [
+        pythonPkgs.pandas
+        pythonPkgs.jupyter
+      ]);
     in {
       devShells.${system}.default =
         pkgs.mkShell { packages = [ pythonEnv ]; };
     };
+
 }
