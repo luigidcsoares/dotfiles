@@ -132,9 +132,15 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
           description = "Python template using pure Nix packages";
           welcomeText = ''
             # Getting started
+            - Update the Python version in both flake.nix and pyproject.toml
+            - Run `nix shell nixpkgs#poetry -c poetry lock`
+            - Run `git init`
+            - Run `git add flake.nix pyproject.toml poetry.lock`
             - Run `nix develop`
 
-            Optionally, you may want to automate the process with direnv:  
+            # Optional
+
+            You may want to automate the process with direnv:  
 
             - Run `echo "use flake" > .envrc`  
             - Run `direnv allow`
