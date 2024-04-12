@@ -10,6 +10,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(ev)
     local opts = { buffer = ev.buf }
     vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-    vim.keymap.set("n", "<Leader>fm", vim.lsp.buf.format, opts)
+    vim.keymap.set("n", "<Leader>fmt", vim.lsp.buf.format, opts)
   end
 })

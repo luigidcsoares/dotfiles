@@ -9,6 +9,7 @@ let
     plugins.plenary-nvim
     plugins.telescope-nvim
     plugins.telescope-file-browser-nvim
+    plugins.toggleterm-nvim
     plugins.nvim-treesitter.withAllGrammars
     plugins.nvim-lspconfig
     plugins.neorg
