@@ -1,19 +1,23 @@
 # overlays/neovim.nix
 final: prev:
 let
-  neovimDefaultPlugins = let plugins = final.vimPlugins;
+  neovimDefaultPlugins = let vimPlugins = final.vimPlugins;
   in [
-    plugins.catppuccin-nvim
-    plugins.nvim-web-devicons
-    plugins.lualine-nvim
-    plugins.plenary-nvim
-    plugins.telescope-nvim
-    plugins.telescope-file-browser-nvim
-    plugins.toggleterm-nvim
-    plugins.nvim-treesitter.withAllGrammars
-    plugins.nvim-lspconfig
-    plugins.neorg
-    plugins.vimtex
+    vimPlugins.catppuccin-nvim
+    vimPlugins.nvim-web-devicons
+    vimPlugins.lualine-nvim
+
+    vimPlugins.plenary-nvim
+    vimPlugins.telescope-nvim
+    vimPlugins.telescope-file-browser-nvim
+    vimPlugins.toggleterm-nvim
+
+    vimPlugins.nvim-lspconfig
+    vimPlugins.nvim-treesitter.withAllGrammars
+
+    vimPlugins.molten-nvim
+    vimPlugins.neorg
+    vimPlugins.vimtex
   ];
 
   neovimWithPlugins = extraPlugins:

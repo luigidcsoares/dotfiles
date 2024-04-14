@@ -353,14 +353,6 @@ Set up zsh with oh-my-zsh and powerlevel10k theme:
     enable = true;
     enableAutosuggestions = true;
     enableCompletion = true;
-    initExtra = ''
-      # Sets up Windows Terminal to duplicate tab at the same dir
-      # See https://learn.microsoft.com/en-us/windows/terminal/tutorials/new-tab-same-directory
-      keep_current_path() { 
-        printf "\e]9;9;%s\e\\" "$(wslpath -w "$PWD")" 
-      }
-      precmd_functions+=(keep_current_path)
-    '';
     oh-my-zsh = {
       enable = true;
       plugins = [ "git" "fzf" ];
@@ -378,6 +370,7 @@ Set up zsh with oh-my-zsh and powerlevel10k theme:
       }
     ];
     shellAliases = {
+      nixos-update = "sudo nixos-rebuild switch --flake ~/workspace/dotfiles/#nixos";
       rm = "rm -i"; 
       rmr = "rm -ir";
       rmrf = "rm -irf";
@@ -423,19 +416,23 @@ Then, we define the Neovim's overlay:
 # overlays/neovim.nix
 final: prev:
 let
-  neovimDefaultPlugins = let plugins = final.vimPlugins;
+  neovimDefaultPlugins = let vimPlugins = final.vimPlugins;
   in [
-    plugins.catppuccin-nvim
-    plugins.nvim-web-devicons
-    plugins.lualine-nvim
-    plugins.plenary-nvim
-    plugins.telescope-nvim
-    plugins.telescope-file-browser-nvim
-    plugins.toggleterm-nvim
-    plugins.nvim-treesitter.withAllGrammars
-    plugins.nvim-lspconfig
-    plugins.neorg
-    plugins.vimtex
+    vimPlugins.catppuccin-nvim
+    vimPlugins.nvim-web-devicons
+    vimPlugins.lualine-nvim
+
+    vimPlugins.plenary-nvim
+    vimPlugins.telescope-nvim
+    vimPlugins.telescope-file-browser-nvim
+    vimPlugins.toggleterm-nvim
+
+    vimPlugins.nvim-lspconfig
+    vimPlugins.nvim-treesitter.withAllGrammars
+
+    vimPlugins.molten-nvim
+    vimPlugins.neorg
+    vimPlugins.vimtex
   ];
 
   neovimWithPlugins = extraPlugins:
@@ -659,6 +656,26 @@ require("nvim-treesitter.configs").setup({
 })
 ```
 
+Set up LSP servers:
+
+``` lua
+-- home/nvim/lspconfig.lua
+local lspconfig = require("lspconfig")
+
+lspconfig.lua_ls.setup({})
+lspconfig.nixd.setup({})
+lspconfig.pyright.setup({})
+
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+  callback = function(ev)
+    local opts = { buffer = ev.buf }
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+    vim.keymap.set("n", "<Leader>fmt", vim.lsp.buf.format, opts)
+  end
+})
+```
+
 Configure toggleterm, so we can easily open and close terminals. 
 A simple alternative is to use ctrl-z + fg, but with toggleterm we get terminals as neovim buffers, which is awesome.
 
@@ -683,25 +700,7 @@ end
 vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()')
 ```
 
-Set up LSP servers:
-
-``` lua
--- home/nvim/lspconfig.lua
-local lspconfig = require("lspconfig")
-
-lspconfig.lua_ls.setup({})
-lspconfig.nixd.setup({})
-lspconfig.pyright.setup({})
-
-vim.api.nvim_create_autocmd("LspAttach", {
-  group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-  callback = function(ev)
-    local opts = { buffer = ev.buf }
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-    vim.keymap.set("n", "<Leader>fmt", vim.lsp.buf.format, opts)
-  end
-})
-```
+**TODO: Molten**
 
 Install and configure Neorg:
 

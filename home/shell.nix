@@ -4,14 +4,6 @@
     enable = true;
     enableAutosuggestions = true;
     enableCompletion = true;
-    initExtra = ''
-      # Sets up Windows Terminal to duplicate tab at the same dir
-      # See https://learn.microsoft.com/en-us/windows/terminal/tutorials/new-tab-same-directory
-      keep_current_path() { 
-        printf "\e]9;9;%s\e\\" "$(wslpath -w "$PWD")" 
-      }
-      precmd_functions+=(keep_current_path)
-    '';
     oh-my-zsh = {
       enable = true;
       plugins = [ "git" "fzf" ];
@@ -29,6 +21,7 @@
       }
     ];
     shellAliases = {
+      nixos-update = "sudo nixos-rebuild switch --flake ~/workspace/dotfiles/#nixos";
       rm = "rm -i"; 
       rmr = "rm -ir";
       rmrf = "rm -irf";
