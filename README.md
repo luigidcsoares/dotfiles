@@ -164,7 +164,7 @@ The `default.nix` file also sets up some general options:
 
 ``` nix
 # system/default.nix
-{ pkgs, ... }: { 
+{ pkgs, lib, ... }: { 
   imports = [ 
     ./wsl.nix
     ./shell.nix
@@ -178,7 +178,7 @@ The `default.nix` file also sets up some general options:
     experimental-features = nix-command flakes
   '';
 
-  time.timeZone = "America/Sao_Paulo";
+  time.timeZone = "Australia/Sydney";
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

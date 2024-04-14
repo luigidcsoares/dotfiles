@@ -1,5 +1,5 @@
 # system/default.nix
-{ pkgs, ... }: { 
+{ pkgs, lib, ... }: { 
   imports = [ 
     ./wsl.nix
     ./shell.nix
@@ -13,7 +13,7 @@
     experimental-features = nix-command flakes
   '';
 
-  time.timeZone = "America/Sao_Paulo";
+  time.timeZone = "Australia/Sydney";
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
