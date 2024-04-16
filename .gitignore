@@ -6,7 +6,8 @@
 !README.*
 
 # Flake
-!flake.*
+!./flake.nix
+!./flake.lock
 
 # Project config
 !.luarc.json
@@ -33,3 +34,6 @@
 !templates/**/
 !templates/python/*.nix
 !templates/python/*.toml
+!templates/latex/*.nix
+!templates/latex/*.tex
+!templates/latex/.latexmkrc

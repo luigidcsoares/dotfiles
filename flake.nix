@@ -45,6 +45,22 @@
 
 
       templates = {
+        latex = {
+          path = ./templates/latex;
+          description = "Minimal LaTeX template";
+          welcomeText = ''
+            # Getting started
+            - Add your latex packages into `texEnv` in `flake.nix`
+            - Run `nix develop` to enter the environment
+
+            # Optional
+
+            You may want to automate the last step with direnv:  
+
+            - Run `echo "use flake" > .envrc`  
+            - Run `direnv allow`
+          '';
+        };
         python = {
           path = ./templates/python;
           description = "Python template using pure Nix packages";

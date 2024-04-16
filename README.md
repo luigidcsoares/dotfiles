@@ -77,7 +77,7 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
       approach allows us to reuse this overlay in other projects as a starting point)
     - NixOS configuration: system-level configs stay under `system/` and user configurations stay under `home/`
     - Minimal dev environment for neovim's lua code (we install dev tools for Nix globally, as we're going to be writing Nix stuff everywhere)
-    - Flake templates, which are stored under `templates/` (**TODO**)
+    - Flake templates, which are stored under `templates/`
 
 ``` nix
 # flake.nix
@@ -127,6 +127,22 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
 
 
       templates = {
+        latex = {
+          path = ./templates/latex;
+          description = "Minimal LaTeX template";
+          welcomeText = ''
+            # Getting started
+            - Add your latex packages into `texEnv` in `flake.nix`
+            - Run `nix develop` to enter the environment
+
+            # Optional
+
+            You may want to automate the last step with direnv:  
+
+            - Run `echo "use flake" > .envrc`  
+            - Run `direnv allow`
+          '';
+        };
         python = {
           path = ./templates/python;
           description = "Python template using pure Nix packages";
