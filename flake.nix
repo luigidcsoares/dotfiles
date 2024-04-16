@@ -63,7 +63,7 @@
         };
         python = {
           path = ./templates/python;
-          description = "Python template using pure Nix packages";
+          description = "Python template using Poetry2Nix";
           welcomeText = ''
             # Getting started
             - Update the Python version in both flake.nix and pyproject.toml
@@ -74,7 +74,7 @@
 
             # Optional
 
-            You may want to automate the process with direnv:  
+            You may want to automate the last step with direnv:  
 
             - Run `echo "use flake" > .envrc`  
             - Run `direnv allow`
