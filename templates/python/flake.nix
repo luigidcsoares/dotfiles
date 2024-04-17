@@ -22,6 +22,6 @@
       };
     in {
       devShells.${system}.default =
-        pkgs.mkShell { packages = [ pythonEnv ]; };
+        pkgs.mkShell { packages = [ pkgs.pyright pythonEnv ]; };
     };
 }
