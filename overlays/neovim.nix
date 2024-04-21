@@ -3,11 +3,17 @@ final: prev:
 let
   neovimDefaultPlugins = let vimPlugins = final.vimPlugins;
   in [
+    # Dependency for neorg and telescope
+    vimPlugins.plenary-nvim
+
+    # Dependencies for neorg
+    vimPlugins.nvim-nio
+    vimPlugins.nui-nvim
+
     vimPlugins.catppuccin-nvim
     vimPlugins.nvim-web-devicons
     vimPlugins.lualine-nvim
 
-    vimPlugins.plenary-nvim
     vimPlugins.telescope-nvim
     vimPlugins.telescope-file-browser-nvim
     vimPlugins.toggleterm-nvim
@@ -26,6 +32,11 @@ let
       plugins = neovimDefaultPlugins ++ extraPlugins;
       config = prev.neovimUtils.makeNeovimConfig {
         plugins = map normalizePlugin plugins;
+        extraLuaPackages = luaPkgs: [
+          # Dependencies for neorg
+          luaPkgs.lua-utils-nvim
+          luaPkgs.pathlib-nvim
+        ];
       };
     in prev.wrapNeovimUnstable prev.neovim-unwrapped
     (config // { wrapRc = false; });

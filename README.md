@@ -259,9 +259,9 @@ Enable dconf (required for [GTK](#user-configuration)) and configure the default
     };
 
     packages = with pkgs; [
-      (iosevka-bin.override { variant = "aile"; })
-        (iosevka-bin.override { variant = "etoile"; })
-        (nerdfonts.override { fonts = [ "Iosevka" ]; })
+      (iosevka-bin.override { variant = "Aile"; })
+      (iosevka-bin.override { variant = "Etoile"; })
+      (nerdfonts.override { fonts = [ "Iosevka" ]; })
     ];
   };
 }
@@ -367,7 +367,7 @@ Set up zsh with oh-my-zsh and powerlevel10k theme:
 { pkgs, ... }: {
   programs.zsh = {
     enable = true;
-    enableAutosuggestions = true;
+    autosuggestion.enable = true;
     enableCompletion = true;
     oh-my-zsh = {
       enable = true;
@@ -434,11 +434,17 @@ final: prev:
 let
   neovimDefaultPlugins = let vimPlugins = final.vimPlugins;
   in [
+    # Dependency for neorg and telescope
+    vimPlugins.plenary-nvim
+
+    # Dependencies for neorg
+    vimPlugins.nvim-nio
+    vimPlugins.nui-nvim
+
     vimPlugins.catppuccin-nvim
     vimPlugins.nvim-web-devicons
     vimPlugins.lualine-nvim
 
-    vimPlugins.plenary-nvim
     vimPlugins.telescope-nvim
     vimPlugins.telescope-file-browser-nvim
     vimPlugins.toggleterm-nvim
@@ -457,6 +463,11 @@ let
       plugins = neovimDefaultPlugins ++ extraPlugins;
       config = prev.neovimUtils.makeNeovimConfig {
         plugins = map normalizePlugin plugins;
+        extraLuaPackages = luaPkgs: [
+          # Dependencies for neorg
+          luaPkgs.lua-utils-nvim
+          luaPkgs.pathlib-nvim
+        ];
       };
     in prev.wrapNeovimUnstable prev.neovim-unwrapped
     (config // { wrapRc = false; });

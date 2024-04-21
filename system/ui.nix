@@ -12,9 +12,9 @@
     };
 
     packages = with pkgs; [
-      (iosevka-bin.override { variant = "aile"; })
-        (iosevka-bin.override { variant = "etoile"; })
-        (nerdfonts.override { fonts = [ "Iosevka" ]; })
+      (iosevka-bin.override { variant = "Aile"; })
+      (iosevka-bin.override { variant = "Etoile"; })
+      (nerdfonts.override { fonts = [ "Iosevka" ]; })
     ];
   };
 }
