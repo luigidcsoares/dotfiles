@@ -13,6 +13,7 @@
     experimental-features = nix-command flakes
   '';
 
+  # time.timeZone = "America/Sao_Paulo";
   time.timeZone = "Australia/Sydney";
 
   # This value determines the NixOS release from which the default

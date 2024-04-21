@@ -32,8 +32,8 @@
 # Nix flake templates
 !templates/
 !templates/**/
-!templates/python/*.nix
-!templates/python/*.toml
+!templates/python/**/*.nix
+!templates/python/**/*.toml
 !templates/latex/*.nix
 !templates/latex/*.tex
 !templates/latex/.latexmkrc

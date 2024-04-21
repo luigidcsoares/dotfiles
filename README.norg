@@ -67,8 +67,6 @@
     -- [neorg-overlay]{https://github.com/nvim-neorg/nixpkgs-neorg-overlay} is used to get the newest features of [Neorg] (unstable)
 
     - Outputs:
-    -- Neovim overlay that wraps it with the plugins we are going to use by default (we could just use home-manager neovim.plugins' option, but this
-       approach allows us to reuse this overlay in other projects as a starting point)
     -- NixOS configuration: system-level configs stay under `system/` and user configurations stay under `home/`
     -- Minimal dev environment for neovim's lua code (we install dev tools for Nix globally, as we're going to be writing Nix stuff everywhere)
     -- Flake templates, which are stored under `templates/`
@@ -98,8 +96,6 @@
           system = "x86_64-linux";
           pkgs = nixpkgs.legacyPackages.${system};
         in {
-          overlays.default = import overlays/neovim.nix;
-    
           nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
             inherit system;
             modules = [
@@ -107,8 +103,7 @@
               ./system
               home-manager.nixosModules.home-manager
               {
-                nixpkgs.overlays =
-                  [ self.overlays.default neorg-overlay.overlays.default ];
+                nixpkgs.overlays = [ neorg-overlay.overlays.default ];
                 home-manager.useGlobalPkgs = true;
                 home-manager.useUserPackages = true;
                 home-manager.users.luigidcsoares = import ./home;
@@ -119,7 +114,6 @@
           devShells.${system}.default = pkgs.mkShell {
             buildInputs = [ pkgs.git pkgs.lua-language-server ];
           };
-    
     
           templates = {
             latex = {
@@ -138,13 +132,36 @@
                 - Run `direnv allow`
               '';
             };
-            python = {
-              path = ./templates/python;
-              description = "Python template using Poetry2Nix";
+    
+            "python/jupyterlab" = {
+              path = ./templates/python/jupyterlab;
+              description = "Python template using Poetry2Nix (Jupyter Lab)";
               welcomeText = ''
                 # Getting started
+    
                 - Update the Python version in both flake.nix and pyproject.toml
-                - Run `nix shell nixpkgs#poetry -c poetry lock`
+                - Add the Python packages you need to pyproject.toml
+                - Run `git init`
+                - Run `git add flake.nix pyproject.toml poetry.lock`
+                - Run `nix develop`
+    
+                # Optional
+    
+                You may want to automate the last step with direnv:  
+    
+                - Run `echo "use flake" > .envrc`  
+                - Run `direnv allow`
+              '';
+            };
+    
+            "python/molten" = {
+              path = ./templates/python/molten;
+              description = "Python template using Poetry2Nix (Neovim with Molten)";
+              welcomeText = ''
+                # Getting started
+    
+                - Update the Python version in both flake.nix and pyproject.toml
+                - Add the Python packages you need to pyproject.toml
                 - Run `git init`
                 - Run `git add flake.nix pyproject.toml poetry.lock`
                 - Run `nix develop`
@@ -188,6 +205,7 @@
         experimental-features = nix-command flakes
       '';
 
+      # time.timeZone = "America/Sao_Paulo";
       time.timeZone = "Australia/Sydney";
 
       # This value determines the NixOS release from which the default
@@ -396,119 +414,77 @@
     }
     @end
 
-    Configure Neovim as the default editor and install plugins (see [Neovim configuration]{** Neovim configuration}). This step requires two files:
-
-    - `home/neovim.nix`: configures the Neovim package that we're going to use
-    - `overlays/neovim.nix`: defines an overlay with the Neovim package wrapped with default plugins and some helper function for later use
-
-    Let's start with `home/neovim.nix`:
+    Configure Neovim as the default editor and install plugins (see [Neovim configuration]{** Neovim configuration}). 
 
     #tangle home.move.neovim.nix
     @code nix
     # home/neovim.nix
     { pkgs, ... }: {
-      home = {
-        sessionVariables.EDITOR = "nvim";
-        packages = [ pkgs.neovim ];
-        file = {
-          ".config/nvim/after".source = ./nvim/after;
-          ".config/nvim/init.lua".text = ''
-            ${builtins.readFile ./nvim/options.lua}
-            ${builtins.readFile ./nvim/catppuccin.lua}
-            ${builtins.readFile ./nvim/lualine.lua}
-            ${builtins.readFile ./nvim/telescope.lua}
-            ${builtins.readFile ./nvim/treesitter.lua}
-            ${builtins.readFile ./nvim/lspconfig.lua}
-            ${builtins.readFile ./nvim/term.lua}
-            ${builtins.readFile ./nvim/neorg.lua}
-            ${builtins.readFile ./nvim/vimtex.lua}
-          '';
-        };
+      home.file = {
+        ".config/nvim/after".source = ./nvim/after;
+        ".config/nvim/init.lua".text = ''
+          ${builtins.readFile ./nvim/options.lua}
+          ${builtins.readFile ./nvim/catppuccin.lua}
+          ${builtins.readFile ./nvim/lualine.lua}
+          ${builtins.readFile ./nvim/telescope.lua}
+          ${builtins.readFile ./nvim/treesitter.lua}
+          ${builtins.readFile ./nvim/lspconfig.lua}
+          ${builtins.readFile ./nvim/term.lua}
+          ${builtins.readFile ./nvim/molten.lua}
+          ${builtins.readFile ./nvim/neorg.lua}
+          ${builtins.readFile ./nvim/vimtex.lua}
+        '';
       };
-    }
-    @end
-
-    Then, we define the Neovim's overlay:
-
-    #tangle overlays.move.neovim.nix
-    @code nix
-    # overlays/neovim.nix
-    final: prev:
-    let
-      neovimDefaultPlugins = let vimPlugins = final.vimPlugins;
-      in [
-        # Dependency for neorg and telescope
-        vimPlugins.plenary-nvim
     
-        # Dependencies for neorg
-        vimPlugins.nvim-nio
-        vimPlugins.nui-nvim
+      programs.neovim = {
+        enable = true;
+        defaultEditor = true;
+        plugins = [
+          # Dependency for neorg and telescope
+          pkgs.vimPlugins.plenary-nvim
     
-        vimPlugins.catppuccin-nvim
-        vimPlugins.nvim-web-devicons
-        vimPlugins.lualine-nvim
+          # Dependencies for neorg
+          pkgs.vimPlugins.nvim-nio
+          pkgs.vimPlugins.nui-nvim
     
-        vimPlugins.telescope-nvim
-        vimPlugins.telescope-file-browser-nvim
-        vimPlugins.toggleterm-nvim
+          pkgs.vimPlugins.catppuccin-nvim
+          pkgs.vimPlugins.nvim-web-devicons
+          pkgs.vimPlugins.lualine-nvim
     
-        vimPlugins.nvim-lspconfig
-        vimPlugins.nvim-treesitter.withAllGrammars
+          pkgs.vimPlugins.telescope-nvim
+          pkgs.vimPlugins.telescope-file-browser-nvim
+          pkgs.vimPlugins.toggleterm-nvim
     
-        vimPlugins.molten-nvim
-        vimPlugins.neorg
-        vimPlugins.vimtex
-      ];
+          pkgs.vimPlugins.nvim-lspconfig
+          pkgs.vimPlugins.nvim-treesitter.withAllGrammars
     
-      neovimWithPlugins = extraPlugins:
-        let
-          normalizePlugin = plugin: { inherit plugin; };
-          plugins = neovimDefaultPlugins ++ extraPlugins;
-          config = prev.neovimUtils.makeNeovimConfig {
-            plugins = map normalizePlugin plugins;
-            extraLuaPackages = luaPkgs: [
-              # Dependencies for neorg
-              luaPkgs.lua-utils-nvim
-              luaPkgs.pathlib-nvim
-            ];
-          };
-        in prev.wrapNeovimUnstable prev.neovim-unwrapped
-        (config // { wrapRc = false; });
-    in {
-      inherit neovimDefaultPlugins neovimWithPlugins;
-      neovim = neovimWithPlugins [ ];
-    }
-    @end
-
-    This helps us to replace plugins in project-specific configurations. For example, when working on Neorg locally, we can define a flake that
-    overrides Neorg's version so that we can use our local version of it:
-
-    @code nix
-    {
-      inputs = {
-        nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-        nixos.url = "github:luigidcsoares/dotfiles";
-      };
-      outputs = { self, nixpkgs, nixos, ... }:
-        let
-          system = "x86_64-linux";
-          neorg-overlay = final: prev: {
-            vimPlugins = prev.vimPlugins // {
-              neorg = prev.vimUtils.buildVimPlugin {
-                pname = prev.vimPlugins.neorg.pname;
-                version = "local";
-                src = self;
-              };
+          pkgs.vimPlugins.molten-nvim
+          pkgs.vimPlugins.neorg
+          pkgs.vimPlugins.vimtex
+          
+          (pkgs.vimUtils.buildVimPlugin {
+            name = "wezterm";
+            src = pkgs.fetchFromGitHub {
+              owner = "willothy";
+              repo = "wezterm.nvim";
+              rev = "v0.4.0";
+              hash = "sha256-HBwmBlvlw1bZNSSOVpy7iuPpGSMpHRra3Ych2PH+aWY=";
             };
-          };
-          pkgs = nixpkgs.legacyPackages.${system}.appendOverlays [
-            neorg-overlay
-            nixos.overlays.default
-          ];
-        in {
-          devShells.${system}.default =
-            pkgs.mkShell { buildInputs = [ pkgs.neovim ]; };
-        };
+          })
+        ];
+    
+        extraLuaPackages = luaPkgs: [
+          # Dependencies for neorg
+          luaPkgs.lua-utils-nvim
+          luaPkgs.pathlib-nvim
+        ];
+    
+        extraPython3Packages = pythonPkgs: [
+          # Dependencies for molten
+          pythonPkgs.jupyter-client
+          pythonPkgs.pynvim
+        ];
+      };
     }
     @end
 
@@ -739,7 +715,14 @@
    vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
    @end
 
-   *TODO: Molten*
+   Configure molten with wezterm as the provider, for a jupyter-like experience:
+
+   #tangle home.nvim.move.molten.lua
+   @code lua
+   -- home/nvim/molten.lua
+   vim.g.molten_auto_open_output = false
+   vim.g.molten_image_provider = "wezterm"
+   @end
 
    Install and configure Neorg:
 

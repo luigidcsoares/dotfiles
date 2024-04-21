@@ -1,5 +1,5 @@
 {
-  description = "Python project with Poetry2Nix";
+  description = "Python project with Poetry2Nix (Neovim with Molten)";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -21,7 +21,17 @@
         groups = [ "dev" ];
       };
     in {
-      devShells.${system}.default =
-        pkgs.mkShell { packages = [ pkgs.pyright pythonEnv ]; };
+      devShells.${system}.default = pkgs.mkShell {
+        packages = [ pkgs.pyright pythonEnv ];
+        shellHook = ''
+          # Initialize the poetry.lock file if it doesn't exist
+          if [ ! -f poetry.lock ]; then
+            nix shell nixpkgs#poetry -c poetry lock
+          fi
+
+          # Install a kernel with the name of the root directory
+          python -m ipykernel install --user --name $(basename $(pwd))
+        '';
+      };
     };
 }

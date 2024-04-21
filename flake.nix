@@ -21,8 +21,6 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in {
-      overlays.default = import overlays/neovim.nix;
-
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
@@ -30,8 +28,7 @@
           ./system
           home-manager.nixosModules.home-manager
           {
-            nixpkgs.overlays =
-              [ self.overlays.default neorg-overlay.overlays.default ];
+            nixpkgs.overlays = [ neorg-overlay.overlays.default ];
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.luigidcsoares = import ./home;
@@ -42,7 +39,6 @@
       devShells.${system}.default = pkgs.mkShell {
         buildInputs = [ pkgs.git pkgs.lua-language-server ];
       };
-
 
       templates = {
         latex = {
@@ -61,13 +57,36 @@
             - Run `direnv allow`
           '';
         };
-        python = {
-          path = ./templates/python;
-          description = "Python template using Poetry2Nix";
+
+        "python/jupyterlab" = {
+          path = ./templates/python/jupyterlab;
+          description = "Python template using Poetry2Nix (Jupyter Lab)";
           welcomeText = ''
             # Getting started
+
             - Update the Python version in both flake.nix and pyproject.toml
-            - Run `nix shell nixpkgs#poetry -c poetry lock`
+            - Add the Python packages you need to pyproject.toml
+            - Run `git init`
+            - Run `git add flake.nix pyproject.toml poetry.lock`
+            - Run `nix develop`
+
+            # Optional
+
+            You may want to automate the last step with direnv:  
+
+            - Run `echo "use flake" > .envrc`  
+            - Run `direnv allow`
+          '';
+        };
+
+        "python/molten" = {
+          path = ./templates/python/molten;
+          description = "Python template using Poetry2Nix (Neovim with Molten)";
+          welcomeText = ''
+            # Getting started
+
+            - Update the Python version in both flake.nix and pyproject.toml
+            - Add the Python packages you need to pyproject.toml
             - Run `git init`
             - Run `git add flake.nix pyproject.toml poetry.lock`
             - Run `nix develop`
