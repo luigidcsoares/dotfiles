@@ -24,10 +24,8 @@
       devShells.${system}.default = pkgs.mkShell {
         packages = [ pkgs.pyright pythonEnv ];
         shellHook = ''
-          # Initialize the poetry.lock file if it doesn't exist
-          if [ ! -f poetry.lock ]; then
-            nix shell nixpkgs#poetry -c poetry lock
-          fi
+          # Initialize/update the poetry.lock file
+          nix shell nixpkgs#poetry -c poetry lock --no-update
 
           # Install a kernel with the name of the root directory
           python -m ipykernel install --user --name $(basename $(pwd))
