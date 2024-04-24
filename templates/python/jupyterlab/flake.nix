@@ -21,12 +21,8 @@
         groups = [ "dev" ];
       };
     in {
-      devShells.${system}.default =
-        pkgs.mkShell { packages = [ pkgs.pyright pythonEnv ]; };
-
-      shellHook = ''
-        # Initialize/update the poetry.lock file
-        nix shell nixpkgs#poetry -c poetry lock --no-update
-      '';
+      devShells.${system}.default = pkgs.mkShell {
+        packages = [ pkgs.pyright poetry pythonEnv ];
+      };
     };
 }

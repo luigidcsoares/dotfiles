@@ -133,7 +133,7 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
 
             You may want to automate the last step with direnv:  
 
-            - Run `echo "use flake" > .envrc`  
+            - Ru `echo "use flake" > .envrc`  
             - Run `direnv allow`
           '';
         };
@@ -144,17 +144,21 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
           welcomeText = ''
             # Getting started
 
-            - Update the Python version in both flake.nix and pyproject.toml
-            - Add the Python packages you need to pyproject.toml
             - Run `git init`
             - Run `git add flake.nix pyproject.toml poetry.lock`
-            - Run `nix develop`
+            - Run `nix develop` to enter the development shell
+
+            # Adding/updating python packages
+
+            - Update pyproject.toml to add, remove, or update dependencies
+            - Run `poetry lock` (with `--no-update`, if you don't want to upgrade dependencies)
+            - Run `nix develop` to enter the development shell
 
             # Optional
 
             You may want to automate the last step with direnv:  
 
-            - Run `echo "use flake" > .envrc`  
+            - Run `printf 'watch_file poetry.lock\nuse flake' > .envrc`  
             - Run `direnv allow`
           '';
         };
@@ -165,17 +169,21 @@ Here we define our flake for the NixOS configuration, along with a minimal devel
           welcomeText = ''
             # Getting started
 
-            - Update the Python version in both flake.nix and pyproject.toml
-            - Add the Python packages you need to pyproject.toml
             - Run `git init`
             - Run `git add flake.nix pyproject.toml poetry.lock`
-            - Run `nix develop`
+            - Run `nix develop` to enter the development shell
+
+            # Adding/updating python packages
+
+            - Update pyproject.toml to add, remove, or update dependencies
+            - Run `poetry lock` (with `--no-update`, if you don't want to upgrade dependencies)
+            - Run `nix develop` to enter the development shell
 
             # Optional
 
             You may want to automate the last step with direnv:  
 
-            - Run `echo "use flake" > .envrc`  
+            - Run `printf 'watch_file poetry.lock\nuse flake' > .envrc`  
             - Run `direnv allow`
           '';
         };

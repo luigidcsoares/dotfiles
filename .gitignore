@@ -32,8 +32,11 @@
 # Nix flake templates
 !templates/
 !templates/**/
-!templates/python/**/*.nix
-!templates/python/**/*.toml
-!templates/latex/*.nix
+!templates/python/**/flake.nix
+!templates/python/**/flake.lock
+!templates/python/**/pyproject.toml
+!templates/python/**/poetry.lock
+!templates/latex/flake.nix
+!templates/latex/flake.lock
 !templates/latex/*.tex
 !templates/latex/.latexmkrc
