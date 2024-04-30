@@ -756,6 +756,14 @@
    })
    @end
 
+   - Define specific options for Neorg files:
+
+   #tangle home.nvim.after.ftplugin.move.norg.lua
+   @code lua
+   -- home/nvim/after/ftplugin/norg.lua
+   vim.opt.textwidth = 150
+   @end
+
    Configure LaTeX (vimtex):
 
    - Fix the path to neovim (nix only)
@@ -768,10 +776,10 @@
    vim.g.vimtex_view_method = "zathura"
    @end
 
-   - Define specific options for Neorg files:
+   - Define specific options for Tex files:
 
-   #tangle home.nvim.after.ftplugin.move.norg.lua
+   #tangle home.nvim.after.ftplugin.move.tex.lua
    @code lua
-   -- home/nvim/after/ftplugin/norg.lua
+   -- home/nvim/after/ftplugin/tex.lua
    vim.opt.textwidth = 150
    @end
