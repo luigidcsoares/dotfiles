@@ -31,6 +31,7 @@
       pkgs.vimPlugins.nvim-web-devicons
       pkgs.vimPlugins.lualine-nvim
 
+      pkgs.vimPlugins.direnv-vim
       pkgs.vimPlugins.telescope-nvim
       pkgs.vimPlugins.telescope-file-browser-nvim
       pkgs.vimPlugins.toggleterm-nvim

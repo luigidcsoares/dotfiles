@@ -22,7 +22,7 @@
       };
     in {
       devShells.${system}.default = pkgs.mkShell {
-        packages = [ pkgs.pyright poetry pythonEnv ];
+        packages = [ pkgs.poetry pkgs.pyright pythonEnv ];
       };
     };
 }
