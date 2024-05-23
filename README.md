@@ -430,7 +430,7 @@ Configure Neovim as the default editor and install plugins (see [Neovim configur
 # home/neovim.nix
 { pkgs, ... }: {
   home.file = {
-    ".config/nvim/after".source = ./nvim/after;
+    # ".config/nvim/after".source = ./nvim/after;
     ".config/nvim/init.lua".text = ''
       ${builtins.readFile ./nvim/options.lua}
       ${builtins.readFile ./nvim/catppuccin.lua}
@@ -579,7 +579,7 @@ vim.g.maplocalleader = ","
 vim.opt.number = true
 vim.opt.splitbelow = true
 vim.opt.splitright = true
-vim.opt.textwidth = 73
+vim.opt.textwidth = 72
 vim.opt.termguicolors = true
 vim.opt.concealcursor = ""
 vim.opt.conceallevel = 2
@@ -750,13 +750,6 @@ require("neorg").setup({
 })
 ```
 
-- Define specific options for Neorg files:
-
-``` lua
--- home/nvim/after/ftplugin/norg.lua
-vim.opt.textwidth = 150
-```
-
 Configure LaTeX (vimtex):
 
 - Fix the path to neovim (nix only)
@@ -766,11 +759,4 @@ Configure LaTeX (vimtex):
 -- home/nvim/vimtex.lua
 vim.g.vimtex_callback_progpath = vim.fn.system("which nvim")
 vim.g.vimtex_view_method = "zathura"
-```
-
-- Define specific options for Tex files:
-
-``` lua
--- home/nvim/after/ftplugin/tex.lua
-vim.opt.textwidth = 150
 ```

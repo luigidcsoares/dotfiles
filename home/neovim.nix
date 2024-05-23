@@ -1,7 +1,7 @@
 # home/neovim.nix
 { pkgs, ... }: {
   home.file = {
-    ".config/nvim/after".source = ./nvim/after;
+    # ".config/nvim/after".source = ./nvim/after;
     ".config/nvim/init.lua".text = ''
       ${builtins.readFile ./nvim/options.lua}
       ${builtins.readFile ./nvim/catppuccin.lua}
