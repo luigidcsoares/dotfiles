@@ -208,7 +208,7 @@ The `default.nix` file also sets up some general options:
 
 ``` nix
 # system/default.nix
-{ pkgs, lib, ... }: { 
+{ pkgs, ... }: { 
   imports = [ 
     ./wsl.nix
     ./shell.nix
@@ -245,6 +245,7 @@ Enable WSL (which uses the [NixOS-WSL](https://github.com/nix-community/NixOS-WS
     defaultUser = "luigidcsoares";
     startMenuLaunchers = true;
   };
+  environment.systemPackages = [ pkgs.wslu ];
 }
 ```
 
@@ -287,10 +288,10 @@ Enable dconf (required for [GTK](#user-configuration)) and configure the default
       };
     };
 
-    packages = with pkgs; [
-      (iosevka-bin.override { variant = "Aile"; })
-      (iosevka-bin.override { variant = "Etoile"; })
-      (nerdfonts.override { fonts = [ "Iosevka" ]; })
+    packages = [
+      (pkgs.iosevka-bin.override { variant = "Aile"; })
+      (pkgs.iosevka-bin.override { variant = "Etoile"; })
+      (pkgs.nerdfonts.override { fonts = [ "Iosevka" ]; })
     ];
   };
 }

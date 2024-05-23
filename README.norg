@@ -202,7 +202,7 @@
     #tangle system.move.default.nix
     @code nix
     # system/default.nix
-    { pkgs, lib, ... }: { 
+    { pkgs, ... }: { 
       imports = [ 
         ./wsl.nix
         ./shell.nix
@@ -240,6 +240,7 @@
         defaultUser = "luigidcsoares";
         startMenuLaunchers = true;
       };
+      environment.systemPackages = [ pkgs.wslu ];
     }
     @end
  
@@ -285,10 +286,10 @@
           };
         };
     
-        packages = with pkgs; [
-          (iosevka-bin.override { variant = "Aile"; })
-          (iosevka-bin.override { variant = "Etoile"; })
-          (nerdfonts.override { fonts = [ "Iosevka" ]; })
+        packages = [
+          (pkgs.iosevka-bin.override { variant = "Aile"; })
+          (pkgs.iosevka-bin.override { variant = "Etoile"; })
+          (pkgs.nerdfonts.override { fonts = [ "Iosevka" ]; })
         ];
       };
     }

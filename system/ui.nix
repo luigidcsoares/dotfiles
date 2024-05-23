@@ -11,10 +11,10 @@
       };
     };
 
-    packages = with pkgs; [
-      (iosevka-bin.override { variant = "Aile"; })
-      (iosevka-bin.override { variant = "Etoile"; })
-      (nerdfonts.override { fonts = [ "Iosevka" ]; })
+    packages = [
+      (pkgs.iosevka-bin.override { variant = "Aile"; })
+      (pkgs.iosevka-bin.override { variant = "Etoile"; })
+      (pkgs.nerdfonts.override { fonts = [ "Iosevka" ]; })
     ];
   };
 }

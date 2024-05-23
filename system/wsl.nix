@@ -5,4 +5,5 @@
     defaultUser = "luigidcsoares";
     startMenuLaunchers = true;
   };
+  environment.systemPackages = [ pkgs.wslu ];
 }

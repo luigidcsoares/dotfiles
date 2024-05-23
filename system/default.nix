@@ -1,5 +1,5 @@
 # system/default.nix
-{ pkgs, lib, ... }: { 
+{ pkgs, ... }: { 
   imports = [ 
     ./wsl.nix
     ./shell.nix
