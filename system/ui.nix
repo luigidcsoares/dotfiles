@@ -12,6 +12,7 @@
     };
 
     packages = [
+      pkgs.lmodern
       (pkgs.iosevka-bin.override { variant = "Aile"; })
       (pkgs.iosevka-bin.override { variant = "Etoile"; })
       (pkgs.nerdfonts.override { fonts = [ "Iosevka" ]; })

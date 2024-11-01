@@ -1,6 +1,7 @@
 -- home/nvim/molten.lua
 vim.g.molten_auto_open_output = false
 vim.g.molten_image_provider = "wezterm"
+vim.g.molten_virt_text_output = true
 
 vim.keymap.set(
   "n", "<localleader>mi", ":MoltenInit<CR>",
@@ -28,6 +29,6 @@ vim.keymap.set(
 )
 
 vim.keymap.set(
-  { "n", "v" }, "<localleader>mo", ":noautocmd MoltenEnterOutput<CR>",
+  "n", "<localleader>mo", ":noautocmd MoltenEnterOutput<CR>",
   { silent = true, desc = "Show/Enter output" }
 )

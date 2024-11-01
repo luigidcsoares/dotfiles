@@ -289,6 +289,7 @@ Enable dconf (required for [GTK](#user-configuration)) and configure the default
     };
 
     packages = [
+      pkgs.lmodern
       (pkgs.iosevka-bin.override { variant = "Aile"; })
       (pkgs.iosevka-bin.override { variant = "Etoile"; })
       (pkgs.nerdfonts.override { fonts = [ "Iosevka" ]; })
@@ -726,6 +727,7 @@ Configure molten with wezterm as the provider, for a jupyter-like experience:
 -- home/nvim/molten.lua
 vim.g.molten_auto_open_output = false
 vim.g.molten_image_provider = "wezterm"
+vim.g.molten_virt_text_output = true
 
 vim.keymap.set(
   "n", "<localleader>mi", ":MoltenInit<CR>",
@@ -753,7 +755,7 @@ vim.keymap.set(
 )
 
 vim.keymap.set(
-  { "n", "v" }, "<localleader>mo", ":noautocmd MoltenEnterOutput<CR>",
+  "n", "<localleader>mo", ":noautocmd MoltenEnterOutput<CR>",
   { silent = true, desc = "Show/Enter output" }
 )
 ```
