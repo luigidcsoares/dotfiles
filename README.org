@@ -1,3 +1,53 @@
+#+title: NixOS WSL Configuration
+#+author: Luigi D. C. Soares
+
+This document covers my NixOS configuration on WSL using nix flake and home manager. The entire configuration is intended to be generated with [[https://orgmode.org/][Org Mode]].
+
+* Quick Start
+
+1. Follow the [[https://github.com/nix-community/NixOS-WSL][NixOS-WSL]] instructions
+   
+2. Clone this repository and cd into the directory:
+
+#+begin_src sh
+git clone git@github.com:luigidcsoares/dotfiles <path/to/repository>
+cd dotfiles
+#+end_src
+
+3. [@3] Search for ~let ... username = ...~ in [[#nixos-configuration][NixOS Configuration]] and replace with your username (or with =nixos=, which simplifies things)
+   
+4. This NixOS configuration is split into multiple org files. Thus, we need to go through all of them to tangle all code blocks. For that, we are going to adapt [[https://fgiasson.com/blog/index.php/2016/10/26/literate-clojure-programming-tangle-all-in-org-mode/][Frederick Giasson]]'s implementation of ~tangle-all~. The script is available here as the file [[file:tangle-all.el][tangle-all.el]] (see the code block below, which can be tangled if needed). To tangle all the necessary code blocks, run the following shell command (skip ~nix shell~ if you already have emacs):
+
+#+begin_src sh :results output silent
+nix shell nixpkgs#emacs -c emacs --script tangle-all.el
+#+end_src
+
+#+begin_src elisp :tangle tangle-all.el :results silent
+(require 'ob-tangle)
+(defun tangle-all ()
+  "Tangle all the Org-mode files recursively in child folders.
+   Returns the list of tangled files"
+  (mapcar (lambda (f) (org-babel-tangle-file f))
+          (directory-files-recursively "." "\\.org$")))
+
+(tangle-all)
+#+end_src
+
+5. [@5] (If you didn't use ~nixos~ for the user) Move ~<path/to/repository>~ to your new home directory
+6. Shutdown the WSL instance and open it again, now with your user by default
+7. Remove the old ~/home/nixos/~ folder
+   
+* NixOS Configuration
+:PROPERTIES:
+:CUSTOM_ID: nixos-configuration
+:END:
+
+Here we define our flake for the NixOS configuration, along with some useful templates.
+
+- System-level configs stay under [[file:system/][system/]]
+- User-level configs stay under [[file:home/][home/]]
+
+#+begin_src nix :tangle flake.nix
 {
   description = "NixOS WSL Flake";
   
@@ -138,3 +188,5 @@
         };
       };
 }
+#+end_src
+

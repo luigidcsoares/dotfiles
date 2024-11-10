@@ -1,0 +1,46 @@
+#+title: Shell Configuration
+#+author: Luigi D. C. Soares
+
+Here we enable and customize zsh as our shell, including
+
+- [[https://ohmyz.sh/][Oh My Zsh]] framework
+- [[https://github.com/romkatv/powerlevel10k][Powerlevel10k]] theme (perhaps try starship?)
+- Some aliases
+
+#+begin_src nix :tangle default.nix
+{ pkgs, ... }: {
+  programs.zsh = {
+    enable = true;
+    autosuggestion.enable = true;
+    enableCompletion = true;
+    oh-my-zsh = {
+      enable = true;
+      plugins = [ "git" "fzf" ];
+    };
+    plugins = [
+      {
+        name = "powerlevel10k";
+        file = "powerlevel10k.zsh-theme";
+        src = "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k";
+      }
+      {
+        name = "powerlevel10k-config";
+        file = "p10k.zsh";
+        src = ./zsh;
+      }
+    ];
+    initExtra = ''
+        nixos-update() {
+          cd ~/workspace/dotfiles;
+          nix shell nixpkgs#emacs -c emacs --script tangle-all.el;
+          sudo nixos-rebuild switch --flake ./#nixos "$@";
+        }
+    '';
+    shellAliases = {
+      rm = "rm -i"; 
+      rmr = "rm -ir";
+      rmrf = "rm -irf";
+    };
+  };
+}
+#+end_src

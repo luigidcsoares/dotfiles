@@ -1,6 +1,8 @@
 # Ignore everything but .gitignore by default, and whitelist as needed
 *
 !.gitignore
+!.gitattributes
+!.git-crypt/
 
 # Docs
 !README.*
@@ -17,13 +19,17 @@
 # NixOS user configuration
 !home/
 !home/**/
+!home/**/*.el
 !home/**/*.lua
 !home/**/*.nix
+!home/**/*.org
 !home/**/*.zsh
 
 # NixOS system configuration
 !system/
+!system/**/
 !system/**/*.nix
+!system/**/*.sh
 
 # My custom overlays
 !overlays/
@@ -40,3 +46,7 @@
 !templates/latex/flake.lock
 !templates/latex/*.tex
 !templates/latex/.latexmkrc
+
+# Secrets, encrypted with git-crypt
+!secrets/
+!secrets/**

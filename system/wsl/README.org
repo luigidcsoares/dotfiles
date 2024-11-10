@@ -1,0 +1,17 @@
+#+title: WSL Configuration
+#+author: Luigi D. C. Soares
+
+Here we set up the WSL module:
+
+#+begin_src nix :tangle default.nix
+{ username, ... }:
+{ pkgs, ... }: {
+  wsl = {
+    enable = true;
+    defaultUser = username;
+    startMenuLaunchers = true;
+  };
+
+  environment.systemPackages = [ pkgs.wslu pkgs.wl-clipboard ];
+}
+#+end_src

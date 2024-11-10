@@ -1,0 +1,12 @@
+#+title: Shell Configuration
+#+author: Luigi D. C. Soares
+
+Here we set up the default shell:
+
+#+begin_src nix :tangle default.nix
+{ pkgs, ... }: {
+  programs.zsh.enable = true;
+  environment.pathsToLink = [ "/share/zsh" ];
+  users.defaultUserShell = pkgs.zsh;
+}
+#+end_src

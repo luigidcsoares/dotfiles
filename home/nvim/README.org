@@ -1,0 +1,279 @@
+#+title: Neovim Configuration
+#+author: Luigi D. C. Soares
+
+Here we configure Neovim. Let's first enable neovim and install some plugins:
+
+#+begin_src nix :tangle default.nix
+{ pkgs, ... }: {
+  programs.neovim = {
+    enable = true;
+    defaultEditor = false;
+    extraLuaConfig = builtins.readFile ./init.lua;
+    plugins = [
+      # Dependency for neorg and telescope
+      pkgs.vimPlugins.plenary-nvim
+
+      # Dependencies for neorg
+      pkgs.vimPlugins.nvim-nio
+      pkgs.vimPlugins.nui-nvim
+
+      pkgs.vimPlugins.catppuccin-nvim
+      pkgs.vimPlugins.nvim-web-devicons
+      pkgs.vimPlugins.lualine-nvim
+
+      pkgs.vimPlugins.direnv-vim
+      pkgs.vimPlugins.telescope-nvim
+      pkgs.vimPlugins.telescope-file-browser-nvim
+      pkgs.vimPlugins.toggleterm-nvim
+
+      pkgs.vimPlugins.nvim-lspconfig
+      pkgs.vimPlugins.nvim-treesitter.withAllGrammars
+
+      pkgs.vimPlugins.molten-nvim
+      pkgs.vimPlugins.neorg
+      pkgs.vimPlugins.vimtex
+      
+      (pkgs.vimUtils.buildVimPlugin {
+        name = "wezterm";
+        src = pkgs.fetchFromGitHub {
+          owner = "willothy";
+          repo = "wezterm.nvim";
+          rev = "v0.4.0";
+          hash = "sha256-HBwmBlvlw1bZNSSOVpy7iuPpGSMpHRra3Ych2PH+aWY=";
+        };
+      })
+    ];
+
+    extraLuaPackages = luaPkgs: [
+      # Dependencies for neorg
+      luaPkgs.lua-utils-nvim
+      luaPkgs.pathlib-nvim
+    ];
+
+    extraPython3Packages = pythonPkgs: [
+      # Dependencies for molten
+      pythonPkgs.jupyter-client
+      pythonPkgs.pynvim
+    ];
+  };
+}
+#+end_src
+
+Now, we set up some general options:
+
+#+begin_src lua :tangle init.lua
+-- Enable project local configuration
+vim.opt.exrc = true
+
+-- Default indentation options
+vim.opt.expandtab = true
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
+
+-- Default keymap options
+vim.g.mapleader = " "
+vim.g.maplocalleader = ","
+
+-- Default UI options
+vim.opt.number = true
+vim.opt.splitbelow = true
+vim.opt.splitright = true
+vim.opt.textwidth = 72
+vim.opt.termguicolors = true
+vim.opt.concealcursor = ""
+vim.opt.conceallevel = 2
+vim.opt.foldlevel = 99
+
+-- Sets up clipboard
+vim.opt.clipboard = "unnamedplus"
+vim.g.clipboard = {
+  name = "WSLClipboard",
+  copy = {
+    ["+"] = "clip.exe",
+    ["*"] = "clip.exe"
+  },
+  paste = {
+    ["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+    ["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+  },
+  cache_enabled = 0
+}
+
+-- Show replace result in split window
+vim.opt.inccommand = "split"
+#+end_src
+
+Set up a colorscheme and lualine:
+
+#+begin_src lua :tangle init.lua
+require("catppuccin").setup({ flavour = "mocha" })
+vim.cmd.colorscheme("catppuccin")
+require("lualine").setup({ options = { theme = "catppuccin" } })
+#+end_src
+
+Install the telescope plugin and extensions:
+
+#+begin_src lua :tangle init.lua
+local telescope = require("telescope")
+local builtin = require("telescope.builtin")
+
+telescope.setup({
+  extensions = {
+    file_browser = {
+      hijack_netrw = true,
+      hidden = true
+    }
+  }
+})
+
+-- Telescope mappings
+vim.keymap.set("n", "<Leader>ff", builtin.find_files, {})
+vim.keymap.set("n", "<leader>lg", builtin.live_grep, {})
+vim.keymap.set("n", "<Leader>bf", builtin.buffers, {})
+vim.keymap.set("n", "<Leader>ht", builtin.help_tags, {})
+
+-- Telescope extensions
+telescope.load_extension("file_browser")
+vim.keymap.set(
+  "n",
+  "<Leader>fb", -- As in emacs "dired"
+  ":Telescope file_browser path=%:p:h select_buffer=true<CR>",
+  {}
+)
+#+end_src
+
+Configure treesitter's highlight, indent and selection:
+
+#+begin_src lua :tangle init.lua
+require("nvim-treesitter.configs").setup({
+  highlight = {
+    enable = true,
+    disable = { "latex" }
+  },
+  indent = { enable = true },
+  incremental_selection = {
+    enable = true,
+    keymaps = {
+      node_incremental = "v",
+      node_decremental = "z",
+      scope_incremental = "<Tab>",
+    }
+  }
+})
+#+end_src
+
+Set up LSP servers:
+
+#+begin_src lua :tangle init.lua
+local lspconfig = require("lspconfig")
+
+lspconfig.lua_ls.setup({})
+lspconfig.nixd.setup({})
+lspconfig.pyright.setup({})
+
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+  callback = function(ev)
+    local opts = { buffer = ev.buf }
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+    vim.keymap.set("n", "<Leader>fmt", vim.lsp.buf.format, opts)
+  end
+})
+#+end_src
+
+Configure toggleterm, so we can easily open and close terminals. A simple alternative is to use ctrl-z + fg, but with toggleterm we get terminals as neovim buffers, which is awesome.
+
+#+begin_src lua :tangle init.lua
+-- home/nvim/term.lua
+require("toggleterm").setup({
+  open_mapping = "<Leader>tt",
+  insert_mappings = false,
+  -- Using <Leader> as <space>, there's gonna be a lag when typing 
+  -- space followed by a t. We can disable terminal mappings, but 
+  -- then we have to exit to normal mode (ESC) every time we want
+  -- to quit the terminal, which is a little incovenient.
+  -- terminal_mappings = false,
+  start_in_insert = true,
+  hide_numbers = true,
+  direction = "float"
+})
+
+function _G.set_terminal_keymaps()
+  local opts = { buffer = 0 }
+  vim.keymap.set("t", "<ESC>", [[<C-\><C-n>]], opts)
+  vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], opts)
+end
+
+vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
+#+end_src
+
+Configure molten with wezterm as the provider, for a jupyter-like experience:
+
+#+begin_src lua :tangle init.lua
+vim.g.molten_auto_open_output = false
+vim.g.molten_image_provider = "wezterm"
+vim.g.molten_virt_text_output = true
+
+vim.keymap.set(
+  "n", "<localleader>mi", ":MoltenInit<CR>",
+  { silent = true, desc = "Initialize the plugin" }
+)
+
+vim.keymap.set(
+  "n", "<localleader>meo", ":MoltenEvaluateOperator<CR>",
+  { silent = true, desc = "Run operator selection" }
+)
+
+vim.keymap.set(
+  "n", "<localleader>mel", ":MoltenEvaluateLine<CR>",
+  { silent = true, desc = "Evaluate line" }
+)
+
+vim.keymap.set(
+  "n", "<localleader>mrc", ":MoltenReevaluateCell<CR>",
+  { silent = true, desc = "Re-evaluate cell" }
+)
+
+vim.keymap.set(
+  "v", "<localleader>mev", ":<C-u>MoltenEvaluateVisual<CR>gv",
+  { silent = true, desc = "Evaluate visual selection" }
+)
+
+vim.keymap.set(
+  "n", "<localleader>mo", ":noautocmd MoltenEnterOutput<CR>",
+  { silent = true, desc = "Show/Enter output" }
+)
+#+end_src
+
+Install and configure Neorg:
+
+#+begin_src lua :tangle init.lua
+require("neorg").setup({
+  load = {
+    ["core.defaults"] = {},
+    ["core.concealer"] = {},
+    ["core.export"] = {},
+    ["core.keybinds"] = {
+      config = {
+        hook = function(keybinds)
+          keybinds.map_event(
+            "norg", "n", keybinds.leader .. "o",
+            "core.looking-glass.magnify-code-block"
+          )
+        end
+      }
+    }
+  }
+})
+#+end_src
+
+Configure LaTeX (vimtex):
+
+- Fix the path to neovim (nix only)
+- Define Zathura as the default PDF viewer
+
+#+begin_src lua :tangle init.lua
+vim.g.vimtex_callback_progpath = vim.fn.system("which nvim")
+vim.g.vimtex_view_method = "zathura"
+#+end_src

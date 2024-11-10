@@ -1,0 +1,13 @@
+#+title: Docker Configuration
+#+author: Luigi D. C. Soares
+
+Here we enable docker in [[https://docs.docker.com/engine/security/rootless/][rootless]] mode:
+
+#+begin_src nix :tangle default.nix
+{ pkgs, ... }: {
+  virtualisation.docker.rootless = {
+    enable = true;
+    setSocketVariable = true;
+  };
+}
+#+end_src

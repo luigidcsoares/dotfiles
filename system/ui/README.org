@@ -1,0 +1,10 @@
+#+title: UI Configuration
+#+author: Luigi D. C. Soares
+
+Here goes any aspect of the ui to be configure at the system level. For now, we only enable dconf:
+
+#+begin_src nix :tangle default.nix
+{ ... }: {
+  programs.dconf.enable = true;
+}
+#+end_src

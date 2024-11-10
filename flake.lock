@@ -1,5 +1,41 @@
 {
   "nodes": {
+    "catppuccin": {
+      "locked": {
+        "lastModified": 1730458408,
+        "narHash": "sha256-JQ+SphQn13bdibKUrBBBznYehXX4xJrxD1ifBp6vSWw=",
+        "owner": "catppuccin",
+        "repo": "nix",
+        "rev": "191fbf2d81a63fad8f62f1233c0051f09b75d0ad",
+        "type": "github"
+      },
+      "original": {
+        "owner": "catppuccin",
+        "repo": "nix",
+        "type": "github"
+      }
+    },
+    "emacs-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "nixpkgs-stable": "nixpkgs-stable"
+      },
+      "locked": {
+        "lastModified": 1730857873,
+        "narHash": "sha256-XvZhPCECx8MVK3wgJ/EXAIclEkzyA4WIALOIeommFDE=",
+        "owner": "nix-community",
+        "repo": "emacs-overlay",
+        "rev": "c626c28c864722e20b7e9b507ccb1ca48d4328af",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "emacs-overlay",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -53,11 +89,11 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1710146030,
-        "narHash": "sha256-SZ5L6eA7HJ/nmkzGG7/ISclqe6oZdOZTNoesiInkXPQ=",
+        "lastModified": 1726560853,
+        "narHash": "sha256-X6rJYSESBVr3hBoH0WbKE5KvhPU5bloyZ2L4K60/fPQ=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "b1d9ab70662946ef0850d488da1c9019f3a9752a",
+        "rev": "c1dfcf08411b08f6b8615f7d8971a2bfa81d5e8a",
         "type": "github"
       },
       "original": {
@@ -101,11 +137,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1710146030,
-        "narHash": "sha256-SZ5L6eA7HJ/nmkzGG7/ISclqe6oZdOZTNoesiInkXPQ=",
+        "lastModified": 1726560853,
+        "narHash": "sha256-X6rJYSESBVr3hBoH0WbKE5KvhPU5bloyZ2L4K60/fPQ=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "b1d9ab70662946ef0850d488da1c9019f3a9752a",
+        "rev": "c1dfcf08411b08f6b8615f7d8971a2bfa81d5e8a",
         "type": "github"
       },
       "original": {
@@ -121,11 +157,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1715077503,
-        "narHash": "sha256-AfHQshzLQfUqk/efMtdebHaQHqVntCMjhymQzVFLes0=",
+        "lastModified": 1730837930,
+        "narHash": "sha256-0kZL4m+bKBJUBQse0HanewWO0g8hDdCvBhudzxgehqc=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "6e277d9566de9976f47228dd8c580b97488734d4",
+        "rev": "2f607e07f3ac7e53541120536708e824acccfaa8",
         "type": "github"
       },
       "original": {
@@ -137,11 +173,11 @@
     "neorg": {
       "flake": false,
       "locked": {
-        "lastModified": 1714577587,
-        "narHash": "sha256-ryFbfjaMYwAGJs9FO2CcmsuwEdh3SgxPdQOlhD9RQOM=",
+        "lastModified": 1730333767,
+        "narHash": "sha256-qTo8rxwvANrgP8UccFhzsNsH+Jbmqv2iOlw0ccLNYm4=",
         "owner": "nvim-neorg",
         "repo": "neorg",
-        "rev": "03fb74927f358320f66cdd1337265c8e7f049fa3",
+        "rev": "488507bb996f75ee29073f50dec32fa220867ca5",
         "type": "github"
       },
       "original": {
@@ -162,11 +198,11 @@
         "norg-meta": "norg-meta"
       },
       "locked": {
-        "lastModified": 1715049017,
-        "narHash": "sha256-NxMU/AqpZHxKEkgJDsrb9WBSA76dpmyzYOXBKjgDSW4=",
+        "lastModified": 1730794817,
+        "narHash": "sha256-x5KXgjTQWrwrsC2ts/nN6Tg1SBCSaloeb+xpV4N4cao=",
         "owner": "nvim-neorg",
         "repo": "nixpkgs-neorg-overlay",
-        "rev": "29c1b61c2f94f0dfb2036032b7e5aeab9c40914d",
+        "rev": "8cad2e72465a3f67078ce0352cfa0d4f6fd1d5cd",
         "type": "github"
       },
       "original": {
@@ -178,11 +214,11 @@
     "neorg-telescope": {
       "flake": false,
       "locked": {
-        "lastModified": 1713548473,
-        "narHash": "sha256-Ytm1Au9ir/31cL36hIlrDFFe1hSSPo9yTVeHysm1WW0=",
+        "lastModified": 1722358034,
+        "narHash": "sha256-ei4uUqpIQjGKzu5ryu0Hlmis9TS9FJsYnjt4J4QdWlw=",
         "owner": "nvim-neorg",
         "repo": "neorg-telescope",
-        "rev": "92c1c6064429c74505de8e5d84a6dc8488a6f8e3",
+        "rev": "ddb2556644cae922699a239bbb0fe16e25b084b7",
         "type": "github"
       },
       "original": {
@@ -200,11 +236,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1715237610,
-        "narHash": "sha256-/ZeWQ4mL3DfHsbTZYc80qMrL4vBfENP0RiGv2KrCrEo=",
+        "lastModified": 1730453870,
+        "narHash": "sha256-d+kIgz4BvTXb7emjSFV3zjNydGmLUmuluQjdBb51R9o=",
         "owner": "nix-community",
         "repo": "NixOS-WSL",
-        "rev": "61fe33f4194bbbc48c090a2e79f4eb61b47c9b75",
+        "rev": "adb6bc4b661a43328752b4575be4968a4990c033",
         "type": "github"
       },
       "original": {
@@ -229,6 +265,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-stable": {
+      "locked": {
+        "lastModified": 1730741070,
+        "narHash": "sha256-edm8WG19kWozJ/GqyYx2VjW99EdhjKwbY3ZwdlPAAlo=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "d063c1dd113c91ab27959ba540c0d9753409edf3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-24.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1644486793,
@@ -247,11 +299,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1714906307,
-        "narHash": "sha256-UlRZtrCnhPFSJlDQE7M0eyhgvuuHBTe1eJ9N9AQlJQ0=",
+        "lastModified": 1730785428,
+        "narHash": "sha256-Zwl8YgTVJTEum+L+0zVAWvXAGbWAuXHax3KzuejaDyo=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "25865a40d14b3f9cf19f19b924e2ab4069b09588",
+        "rev": "4aa36568d413aca0ea84a1684d2d46f55dbabad7",
         "type": "github"
       },
       "original": {
@@ -304,6 +356,8 @@
     },
     "root": {
       "inputs": {
+        "catppuccin": "catppuccin",
+        "emacs-overlay": "emacs-overlay",
         "home-manager": "home-manager",
         "neorg-overlay": "neorg-overlay",
         "nixos-wsl": "nixos-wsl",

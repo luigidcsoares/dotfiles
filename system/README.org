@@ -1,3 +1,16 @@
+#+title: System-Level Configuration
+#+author: Luigi D. C. Soares
+
+This module is structured as follows:
+
+- [[file:dev/][dev/]] sets up development packages
+- [[file:docker/][docker/]] sets up, well, docker
+- [[file:ui/][ui/]] sets up user-interface elements, such as fonts
+- [[file:wsl/][wsl/]] enables nixos wsl and set up some utilities
+
+These submodules are aggregated into [[file:default.nix][default.nix]], defined below. Remember to change the time zone as appropiate (TODO: how to automate this?).
+
+#+begin_src nix :tangle default.nix
 { username, ... }:
 { pkgs, ... }: { 
   imports = [ 
@@ -25,3 +38,4 @@
   # https://nixos.org/nixos/options.html).
   system.stateVersion = "23.11";
 }
+#+end_src

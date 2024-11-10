@@ -1,0 +1,32 @@
+#+title: Security Configuration
+#+author: Luigi D. C. Soares
+
+Here we set up security-related programs, namely:
+
+- Enable and configure ssh
+- Enable and configure gpg and the gpg-agent, including ssh support
+- Enable [[https://www.passwordstore.org/][pass]] for managing passwords
+- Enable [[https://github.com/mdellweg/pass_secret_service/][pass-secret-service]]
+
+#+begin_src nix :tangle default.nix
+{ rootPath, ... }:
+{ lib, pkgs, ... }: {
+  home.packages = [ pkgs.git-crypt ];
+  programs.ssh = {
+    enable = true;
+    addKeysToAgent = "yes";
+    extraConfig = builtins.readFile "${rootPath}/secrets/ssh_config";
+  };
+
+  programs.gpg.enable = true;
+  services.ssh-agent.enable = false;
+  services.gpg-agent = {
+    enable = true;
+    enableSshSupport = true;
+    pinentryPackage = pkgs.pinentry-qt;
+  };
+
+  programs.password-store.enable = true;
+  services.pass-secret-service.enable = true;
+}
+#+end_src

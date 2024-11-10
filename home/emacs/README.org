@@ -1,0 +1,484 @@
+#+title: Emacs Configuration
+#+author: Luigi D. C. Soares
+
+Here we set up the emacs package and configuration. First, let's install it. The idea is that we are going to use [[https://github.com/nix-community/emacs-overlay][emacs-overlay]]'s ~emacsWithPackagesFromUsePackage~ to handle packages. However, home-manager does not play nicely with it, so we are going to set up by hand what ~emacsWithPackagesFromUsePackage~ does (albeit simplified), using ~parsePackagesFromUsePackage~ function to fetch the list of packages to be installed:
+
+#+begin_src nix :tangle default.nix
+{ emacs-overlay, ... }:
+{ pkgs, ... }:
+let
+  earlyInitText = builtins.readFile ./early-init.el;
+  initText = builtins.readFile ./init.el;
+  parse = pkgs.callPackage "${emacs-overlay}/parse.nix" { };
+  mkPackageError =
+    name:
+    throw "Emacs package ${name}, declare wanted with use-package, not found";
+  packages = parse.parsePackagesFromUsePackage {
+    configText = initText;
+    isOrgModeFile = false;
+    alwaysTangle = false;
+    alwaysEnsure = false;
+  };
+in
+{
+  programs.emacs = {
+    enable = true;
+    package = pkgs.emacs-pgtk;
+    extraPackages =
+      epkgs: map (name: epkgs.${name} or (mkPackageError name)) packages;
+  };
+
+  home = {
+    file = {
+      ".config/emacs/early-init.el".text = earlyInitText;
+      ".config/emacs/init.el".text = initText;
+    };
+    sessionVariables.EDITOR = "emacs";
+  };
+}
+#+end_src
+
+* Core
+
+We start by configuring the =early-init.el= file to not initialize packages at startup:
+
+#+begin_src elisp :tangle early-init.el
+(setq package-enable-at-startup nil)
+#+end_src
+
+We are going to use [[https://github.com/jwiegley/use-package][use-package]] to configure our packages. Whenever you ~ensure t~ it means that the package must be installed (and we are using [[https://github.com/nix-community/emacs-overlay][emacs-overlay]]'s ~emacsWithPackagesFromUsePackage~ for that). Let's enable it:
+
+#+begin_src elisp :tangle init.el
+(eval-when-compile (require 'use-package))
+#+end_src
+
+* User Interface
+
+Maximise screen at startup:
+
+#+begin_src elisp :tangle init.el
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+#+end_src
+
+Configure the splash screen with [[https://github.com/emacs-dashboard/emacs-dashboard][Emacs Dashboard]]:
+
+#+begin_src elisp :tangle init.el
+;; TODO: Configure dashboard package
+;; Temporarily disable splash screen
+(setq inhibit-startup-message t)
+#+end_src
+
+Clean up some stuff:
+
+#+begin_src elisp :tangle init.el
+(tooltip-mode -1)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+#+end_src
+
+Display line numbers:
+
+#+begin_src elisp :tangle init.el
+(use-package display-line-numbers
+  :hook ((prog-mode text-mode conf-mode) . display-line-numbers-mode))
+#+end_src
+
+Configure the [[https://github.com/catppuccin/emacs][catppuccin]] theme:
+
+#+begin_src elisp :tangle init.el
+(use-package catppuccin-theme
+  :ensure t
+  :custom (catppuccin-enlarge-headings nil)
+  :config (load-theme 'catppuccin :no-confirm))
+#+end_src
+
+Configure fonts for fixed and variable pitch:
+
+#+begin_src elisp :tangle init.el
+(set-face-attribute 'default nil :font "Iosevka Nerd Font Mono")
+(set-face-attribute 'variable-pitch nil :font "Iosevka Etoile")
+#+end_src
+
+Configure font ligatures (Iosevka):
+
+#+begin_src elisp :tangle init.el
+(use-package ligature
+  :ensure t
+  :config
+  ;; Enable all Iosevka ligatures in programming modes
+  (ligature-set-ligatures
+   'prog-mode
+   '("<---" "<--"  "<<-" "<-" "->" "-->" "--->" "<->" "<-->" "<--->"
+     "<---->" "<!--" "<==" "<===" "<=" "=>" "=>>" "==>" "===>" ">="
+     "<=>" "<==>" "<===>" "<====>" "<!---" "<~~" "<~" "~>" "~~>" "::"
+     ":::" "==" "!=" "===" "!==" ":=" ":-" ":+" "<*" "<*>" "*>" "<|"
+     "<|>" "|>" "+:" "-:" "=:" "<******>" "++" "+++"))
+  ;; Enables ligature checks globally in all buffers.
+  ;; You can also do it per mode with `ligature-mode'.
+  (global-ligature-mode t))
+#+end_src
+
+Configure [[https://github.com/seagle0128/doom-modeline][doom-modeline]] with [[https://github.com/rainstormstudio/nerd-icons.el][nerd-icons]]:
+
+#+begin_src elisp :tangle init.el
+(use-package nerd-icons :ensure t)
+(use-package doom-modeline
+  :ensure t
+  :hook (after-init . doom-modeline-mode)
+  :custom (nerd-icons-font-family "Symbols Nerd Font Mono"))
+#+end_src
+
+Enable ANSI escape codes to colorize outputs ([[https://endlessparentheses.com/ansi-colors-in-the-compilation-buffer-output.html][see]]):
+
+#+begin_src elisp :tangle init.el
+(use-package ansi-color
+  :hook (compilation-filter . ansi-color-compilation-filter))
+#+end_src
+
+* Editor
+
+Set up model editing with [[https://github.com/meow-edit/meow][Meow]] ([[https://github.com/meow-edit/meow/blob/master/KEYBINDING_QWERTY.org][qwerty layout]]):
+
+#+begin_src elisp :tangle init.el
+(defun my/meow-qwerty ()
+  (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+  (meow-motion-overwrite-define-key
+   '("j" . meow-next)
+   '("k" . meow-prev)
+   '("[" . meow-beginning-of-thing)
+   '("]" . meow-end-of-thing)
+   '("<escape>" . ignore))
+  (meow-leader-define-key
+   ;; SPC j/k will run the original command in MOTION state.
+   '("j" . "H-j")
+   '("k" . "H-k")
+   '("[" . "H-[")
+   '("]" . "H-]")
+   ;; Use SPC (0-9) for digit arguments.
+   '("1" . meow-digit-argument)
+   '("2" . meow-digit-argument)
+   '("3" . meow-digit-argument)
+   '("4" . meow-digit-argument)
+   '("5" . meow-digit-argument)
+   '("6" . meow-digit-argument)
+   '("7" . meow-digit-argument)
+   '("8" . meow-digit-argument)
+   '("9" . meow-digit-argument)
+   '("0" . meow-digit-argument)
+   '("/" . meow-keypad-describe-key)
+   '("?" . meow-cheatsheet))
+  (meow-normal-define-key
+   '("0" . meow-expand-0)
+   '("9" . meow-expand-9)
+   '("8" . meow-expand-8)
+   '("7" . meow-expand-7)
+   '("6" . meow-expand-6)
+   '("5" . meow-expand-5)
+   '("4" . meow-expand-4)
+   '("3" . meow-expand-3)
+   '("2" . meow-expand-2)
+   '("1" . meow-expand-1)
+   '("-" . negative-argument)
+   '(";" . meow-reverse)
+   '("," . meow-inner-of-thing)
+   '("." . meow-bounds-of-thing)
+   '("[" . meow-beginning-of-thing)
+   '("]" . meow-end-of-thing)
+   '("a" . meow-append)
+   '("A" . meow-open-below)
+   '("b" . meow-back-word)
+   '("B" . meow-back-symbol)
+   '("c" . meow-change)
+   '("d" . meow-delete)
+   '("D" . meow-backward-delete)
+   '("e" . meow-next-word)
+   '("E" . meow-next-symbol)
+   '("f" . meow-find)
+   '("g" . meow-cancel-selection)
+   '("G" . meow-grab)
+   '("h" . meow-left)
+   '("H" . meow-left-expand)
+   '("i" . meow-insert)
+   '("I" . meow-open-above)
+   '("j" . meow-next)
+   '("J" . meow-next-expand)
+   '("k" . meow-prev)
+   '("K" . meow-prev-expand)
+   '("l" . meow-right)
+   '("L" . meow-right-expand)
+   '("m" . meow-join)
+   '("n" . meow-search)
+   '("o" . meow-block)
+   '("O" . meow-to-block)
+   '("p" . meow-yank)
+   '("q" . meow-quit)
+   '("Q" . meow-goto-line)
+   '("r" . meow-replace)
+   '("R" . meow-swap-grab)
+   '("s" . meow-kill)
+   '("t" . meow-till)
+   '("u" . meow-undo)
+   '("U" . meow-undo-in-selection)
+   '("v" . meow-visit)
+   '("w" . meow-mark-word)
+   '("W" . meow-mark-symbol)
+   '("x" . meow-line)
+   '("X" . meow-goto-line)
+   '("y" . meow-save)
+   '("Y" . meow-sync-grab)
+   '("z" . meow-pop-selection)
+   '("'" . repeat)
+   '("<escape>" . ignore)))
+
+(use-package meow
+  :ensure t
+  :demand t
+  :config
+  (my/meow-qwerty)
+  (meow-leader-define-key '("u" . meow-universal-argument))
+  (meow-global-mode))
+#+end_src
+
+Auto revert (sync) buffers when changes are saved
+
+#+begin_src elisp :tangle init.el
+(use-package autorevert :config (global-auto-revert-mode))
+#+end_src
+
+* Version Control
+
+We don't need backup nor lockfiles, just go with git. On the other hand, auto-save files are good fallbacks in case of crashes:
+
+#+begin_src elisp :tangle init.el
+(use-package files
+  :custom
+  ((create-lockfiles nil)
+   (make-backup-files nil)
+   (auto-save-default t)))
+#+end_src
+
+I might eventually install [[https://github.com/magit/magit][magit]], but for now I'm going to try the builtin [[https://www.emacswiki.org/emacs/VersionControl#VC][vc]].
+
+* Languages
+
+** Org Mode
+
+Customise org-mode:
+
+#+begin_src elisp :tangle init.el
+(use-package org
+  :hook (org-mode . visual-line-mode)
+  :custom
+  (org-hide-emphasis-markers t)
+  (org-startup-indented t)
+  (org-pretty-entities t)
+  (org-src-preserve-indentation nil)
+  (org-edit-src-content-indentation 0))
+
+(use-package org-bullets
+  :ensure t
+  :hook (org-mode . org-bullets-mode))
+#+end_src
+
+Configure org-babel and enable languages:
+
+#+begin_src elisp :tangle init.el
+(defun my/org-babel-do-load-languages ()
+  (org-babel-do-load-languages 'org-babel-load-languages
+			       org-babel-load-languages))
+
+(use-package ob
+  :hook (after-init . my/org-babel-do-load-languages)
+  :custom
+  ;; Don't need permission, just be careful!
+  (org-confirm-babel-evaluate nil)
+  (org-babel-load-languages
+   '((C . t)
+     (elixir . t)
+     (emacs-lisp . t)
+     (nix . t)
+     (shell . t))))
+
+(use-package ob-elixir :ensure t :defer t)
+(use-package ob-nix :ensure t :defer t)
+#+end_src
+
+** C/C++
+
+#+begin_src elisp :tangle init.el
+(use-package cc-mode
+  :mode ("\\.tpp\\'" . c++-mode)
+  :config (c-set-offset 'innamespace 0))
+#+end_src
+
+** Elixir
+
+#+begin_src elisp :tangle init.el
+(use-package elixir-mode :ensure t :defer t)
+#+end_src
+
+** Nix
+
+#+begin_src elisp :tangle init.el
+(use-package nix-mode :ensure t :mode "\\.nix\\'")
+#+end_src
+
+** Latex
+
+Install and configure [[https://www.gnu.org/software/auctex/][AUCTeX]]:
+
+#+begin_src elisp :tangle init.el
+(use-package tex
+  :ensure auctex
+  :hook
+  (LaTeX-mode-hook . visual-line-mode)
+  (TeX-after-compilation-finished . TeX-revert-document-buffer)
+  :custom
+  (TeX-parse-self t)
+  (TeX-auto-save t)
+  (TeX-electric-sub-and-superscript t)
+  ;; Use hidden directories for AUCTeX files.
+  (TeX-auto-local ".auctex-auto")
+  (TeX-style-local ".auctex-style")
+  ;; Just save, don't ask before each compilation.
+  (TeX-save-query nil)
+  (TeX-source-correlate-mode t)
+  (TeX-source-correlate-method 'synctex)
+  ;; Don't start the Emacs server when correlating sources.
+  (TeX-source-correlate-start-server nil)
+  :config
+  (add-to-list 'TeX-view-program-selection
+               '(output-pdf "PDF Tools")))
+#+end_src
+
+Install [[https://github.com/tom-tan/auctex-latexmk][auctex-latexmk]] to add LatexMK support to AUCTeX:
+
+#+begin_src elisp :tangle init.el
+(use-package auctex-latexmk
+  :ensure t
+  :custom (auctex-latexmk-inherit-TeX-PDF-mode t)
+  :config (auctex-latexmk-setup))
+#+end_src
+
+* Tools
+
+** Clipboard
+
+WSL: Looks like copying text from emacs to outside is buggy. Let's try this [[https://github.com/microsoft/wslg/issues/15#issuecomment-1193370697][workaround]]:
+
+#+begin_src elisp :tangle init.el
+(when (and (getenv "WAYLAND_DISPLAY")
+	   (not (equal (getenv "GDK_BACKEND") "x11")))
+  (setq interprogram-cut-function
+	(lambda (text)
+	  (start-process "wl-copy" nil "wl-copy" "--trim-newline"
+			 "--type" "text/plain;charset=utf-8" text))))
+#+end_src
+
+** Direnv
+
+Install [[https://github.com/purcell/envrc][envrc]] to set up per-directory environments:
+
+#+begin_src elisp :tangle init.el
+(use-package envrc
+  :ensure t
+  :if (executable-find "direnv")
+  :hook ((after-init . envrc-global-mode)))
+#+end_src
+
+
+** PDF Tools
+
+Install and config PDF tools:
+
+#+begin_src elisp :tangle init.el
+(use-package pdf-tools
+  :ensure t
+  :mode (("\\.pdf\\'" . pdf-view-mode))
+  :config
+  (use-package pdf-occur :commands (pdf-occur-global-minor-mode))
+  (use-package pdf-history :commands (pdf-history-minor-mode))
+  (use-package pdf-links :commands (pdf-links-minor-mode))
+  (use-package pdf-outline :commands (pdf-outline-minor-mode))
+  (use-package pdf-annot :commands (pdf-annot-minor-mode))
+  (use-package pdf-sync :commands (pdf-sync-minor-mode))
+  (pdf-tools-install))
+#+end_src
+
+** Search and Completion
+
+Install [[https://github.com/minad/vertico][vertico]] for vertical completion UI:
+
+#+begin_src elisp :tangle init.el
+(use-package vertico
+  :ensure t
+  :hook (after-init . vertico-mode))
+#+end_src
+
+Install [[https://github.com/oantolin/orderless][orderless]] to search for components (e.g., "describe key" and "key describe")
+
+#+begin_src elisp :tangle init.el
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides
+   '((file (styles basic partial-completion)))))
+#+end_src
+
+Install [[https://github.com/minad/marginalia][marginalia]] for rich annotations (what does a command do?)
+
+#+begin_src elisp :tangle init.el
+(use-package marginalia
+  :ensure t
+  :hook (after-init . marginalia-mode))
+#+end_src
+
+Install [[https://github.com/minad/consult][consult]] for search and navigation
+
+#+begin_src elisp :tangle init.el
+(use-package consult
+  :ensure t
+  :bind
+  (([remap switch-to-buffer] . consult-buffer)
+   ;; C-s bindings (search map)
+   ("C-c s f" . consult-find)
+   ("C-c s l" . consult-line)
+   ("C-c s L" . consult-line-multi)
+   ("C-c s r" . consult-ripgrep)))
+#+end_src
+
+Install [[https://github.com/oantolin/embark][embark and embark-consult]] to act based on what's near point
+
+#+begin_src elisp :tangle init.el
+(use-package embark
+  :ensure t
+  :bind
+  (("C-c e a" . embark-act)
+   ("C-c e d" . embark-dwim))
+  :custom
+  (embark-indicators '(embark-minimal-indicator
+                       embark-highlight-indicator
+                       embark-isearch-highlight-indicator))
+  (embark-prompter #'embark-completing-read-prompter)
+  :init (setq prefix-help-command #'embark-prefix-help-command)
+  :config
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+(use-package embark-consult
+  :ensure t
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
+#+end_src
+
+** Shell/Terminal
+
+Ideally I would use eshell, but it requires some effort to copy my zsh aliases. So, let's try this [[https://github.com/riscy/shx-for-emacs][shx]] package:
+
+#+begin_src elisp :tangle init.el
+(use-package shx :ensure t :config (shx-global-mode 1))
+#+end_src

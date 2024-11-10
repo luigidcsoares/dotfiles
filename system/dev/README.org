@@ -1,0 +1,13 @@
+#+title: Development Configuration
+#+author: Luigi D. C. Soares
+
+Here we set up some development tools at system level:
+
+#+begin_src nix :tangle default.nix
+{ pkgs, ... }: {
+  environment.systemPackages = [ 
+    pkgs.nixd 
+    pkgs.nixfmt-rfc-style 
+  ];
+}
+#+end_src
