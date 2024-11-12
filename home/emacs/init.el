@@ -214,11 +214,6 @@
   (add-to-list 'TeX-view-program-selection
                '(output-pdf "PDF Tools")))
 
-(use-package auctex-latexmk
-  :ensure t
-  :custom (auctex-latexmk-inherit-TeX-PDF-mode t)
-  :config (auctex-latexmk-setup))
-
 (when (and (getenv "WAYLAND_DISPLAY")
 	   (not (equal (getenv "GDK_BACKEND") "x11")))
   (setq interprogram-cut-function
@@ -291,3 +286,5 @@
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package shx :ensure t :config (shx-global-mode 1))
+
+(setq shell-command-switch "-ic")

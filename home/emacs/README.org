@@ -352,15 +352,6 @@ Install and configure [[https://www.gnu.org/software/auctex/][AUCTeX]]:
                '(output-pdf "PDF Tools")))
 #+end_src
 
-Install [[https://github.com/tom-tan/auctex-latexmk][auctex-latexmk]] to add LatexMK support to AUCTeX:
-
-#+begin_src elisp :tangle init.el
-(use-package auctex-latexmk
-  :ensure t
-  :custom (auctex-latexmk-inherit-TeX-PDF-mode t)
-  :config (auctex-latexmk-setup))
-#+end_src
-
 * Tools
 
 ** Clipboard
@@ -481,4 +472,10 @@ Ideally I would use eshell, but it requires some effort to copy my zsh aliases. 
 
 #+begin_src elisp :tangle init.el
 (use-package shx :ensure t :config (shx-global-mode 1))
+#+end_src
+
+Whenever possible, though, I'd like to just rely on (async-) shell-command. Let's configure it so that aliases are available:
+
+#+begin_src elisp :tangle init.el
+(setq shell-command-switch "-ic")
 #+end_src
