@@ -194,9 +194,6 @@
 
 (use-package tex
   :ensure auctex
-  :hook
-  (LaTeX-mode-hook . visual-line-mode)
-  (TeX-after-compilation-finished . TeX-revert-document-buffer)
   :custom
   (TeX-parse-self t)
   (TeX-auto-save t)
@@ -211,8 +208,9 @@
   ;; Don't start the Emacs server when correlating sources.
   (TeX-source-correlate-start-server nil)
   :config
-  (add-to-list 'TeX-view-program-selection
-               '(output-pdf "PDF Tools")))
+  (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
+  (add-hook 'TeX-mode-hook #'visual-line-mode)
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer))
 
 (when (and (getenv "WAYLAND_DISPLAY")
 	   (not (equal (getenv "GDK_BACKEND") "x11")))
