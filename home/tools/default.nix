@@ -14,6 +14,7 @@
     extraConfig = {
       credential.helper = "${pkgs.pass-git-helper}/bin/pass-git-helper";
       init.defaultBranch = "main";
+      pull.rebase = true;
     };
   };
   

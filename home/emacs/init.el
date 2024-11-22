@@ -210,7 +210,8 @@
   :config
   (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
   (add-hook 'TeX-mode-hook #'visual-line-mode)
-  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer))
+  (add-hook 'TeX-after-compilation-finished-functions
+	    #'TeX-revert-document-buffer))
 
 (when (and (getenv "WAYLAND_DISPLAY")
 	   (not (equal (getenv "GDK_BACKEND") "x11")))
