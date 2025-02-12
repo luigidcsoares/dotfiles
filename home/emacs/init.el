@@ -179,18 +179,11 @@
      (elixir . t)
      (emacs-lisp . t)
      (nix . t)
+     (python . t)
      (shell . t))))
 
 (use-package ob-elixir :ensure t :defer t)
 (use-package ob-nix :ensure t :defer t)
-
-(use-package cc-mode
-  :mode ("\\.tpp\\'" . c++-mode)
-  :config (c-set-offset 'innamespace 0))
-
-(use-package elixir-mode :ensure t :defer t)
-
-(use-package nix-mode :ensure t :mode "\\.nix\\'")
 
 (use-package tex
   :ensure auctex
@@ -212,6 +205,28 @@
   (add-hook 'TeX-mode-hook #'visual-line-mode)
   (add-hook 'TeX-after-compilation-finished-functions
 	    #'TeX-revert-document-buffer))
+
+(use-package nix-mode :ensure t :mode "\\.nix\\'")
+
+(use-package cc-mode
+  :mode ("\\.tpp\\'" . c++-mode)
+  :config (c-set-offset 'innamespace 0))
+
+(use-package elixir-mode
+  :ensure t
+  :mode ("\\.ex\\'" "\\.exs\\'"))
+
+(use-package rust-mode
+  :ensure t
+  :mode "\\.rs\\'")
+
+(use-package rustic
+  :ensure t
+  :config
+  (setq rustic-format-on-save nil)
+  :custom
+  (rustic-cargo-use-last-stored-arguments t)
+  (rustic-lsp-client 'eglot))
 
 (when (and (getenv "WAYLAND_DISPLAY")
 	   (not (equal (getenv "GDK_BACKEND") "x11")))
