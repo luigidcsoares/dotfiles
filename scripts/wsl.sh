@@ -63,6 +63,7 @@ wsl-init() {
     git switch -c wsl
 
     git remote add -t wsl wsl "$windows_repo"
+    git fetch
     git branch --set-upstream-to=wsl/wsl
 }
 
