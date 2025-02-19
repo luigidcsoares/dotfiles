@@ -13,6 +13,10 @@
     experimental-features = nix-command flakes
   '';
 
+  # Enable nix-ld for third party binaries.
+  # WARNING: use this as a last resort, prefer to rely on nix.
+  programs.nix-ld.enable = true;
+
   # time.timeZone = "America/Sao_Paulo";
   time.timeZone = "Australia/Sydney";
 
