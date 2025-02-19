@@ -8,6 +8,7 @@ Here we enable and customize zsh as our shell, including
 - Some aliases
 
 #+begin_src nix :tangle default.nix
+{ rootPath, ... }:
 { pkgs, ... }: {
   programs.zsh = {
     enable = true;
@@ -30,11 +31,8 @@ Here we enable and customize zsh as our shell, including
       }
     ];
     initExtra = ''
-        nixos-update() {
-          cd ~/workspace/dotfiles;
-          nix shell nixpkgs#emacs -c emacs --script tangle-all.el;
-          sudo nixos-rebuild switch --flake ./#nixos "$@";
-        }
+        ${builtins.readFile (rootPath + "/scripts/nixos.sh")}
+        ${builtins.readFile (rootPath + "/scripts/wsl.sh")}
     '';
     shellAliases = {
       rm = "rm -i"; 

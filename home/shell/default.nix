@@ -1,3 +1,4 @@
+{ rootPath, ... }:
 { pkgs, ... }: {
   programs.zsh = {
     enable = true;
@@ -20,11 +21,8 @@
       }
     ];
     initExtra = ''
-        nixos-update() {
-          cd ~/workspace/dotfiles;
-          nix shell nixpkgs#emacs -c emacs --script tangle-all.el;
-          sudo nixos-rebuild switch --flake ./#nixos "$@";
-        }
+        ${builtins.readFile (rootPath + "/scripts/nixos.sh")}
+        ${builtins.readFile (rootPath + "/scripts/wsl.sh")}
     '';
     shellAliases = {
       rm = "rm -i"; 

@@ -4,7 +4,7 @@
     (import ./emacs { inherit emacs-overlay; })
     ./nvim
     (import ./security { inherit rootPath; })
-    ./shell
+    (import ./shell { inherit rootPath; })
     (import ./ui { inherit catppuccin; })
     ./tools
     ./zathura
