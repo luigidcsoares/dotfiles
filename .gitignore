@@ -50,3 +50,7 @@
 # Secrets, encrypted with git-crypt
 !secrets/
 !secrets/**
+
+# Scripts
+!scripts/
+!scripts/*.sh
