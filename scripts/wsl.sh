@@ -45,7 +45,7 @@ wsl-init() {
 	git commit -m "[wsl-init] initial commit"
     fi
     git switch -c wsl
-    git config receive.denyCurrentBranch
+    git config receive.denyCurrentBranch updateInstead
     
     cd "$origin_path"
     mkdir -p "$wsl_repo"
