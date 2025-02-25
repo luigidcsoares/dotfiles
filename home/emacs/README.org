@@ -21,6 +21,7 @@ let
   };
 in
 {
+  services.emacs.enable = true;
   programs.emacs = {
     enable = true;
     package = pkgs.emacs-pgtk;
@@ -54,10 +55,25 @@ We are going to use [[https://github.com/jwiegley/use-package][use-package]] to 
 
 * User Interface
 
-Maximise screen at startup:
+- Clean up some stuff, but enable tab-bar-mode 
+- Always start maximized, without decorations (title bar)
+
+#+begin_src elisp :tangle early-init.el
+(tooltip-mode -1)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(tab-bar-mode t)
+
+(push '(fullscreen . maximized) default-frame-alist)
+(push '(undecorated . t) default-frame-alist)
+#+end_src
+
+Display line numbers:
 
 #+begin_src elisp :tangle init.el
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
+(use-package display-line-numbers
+  :hook ((prog-mode text-mode conf-mode) . display-line-numbers-mode))
 #+end_src
 
 Configure the splash screen with [[https://github.com/emacs-dashboard/emacs-dashboard][Emacs Dashboard]]:
@@ -66,22 +82,6 @@ Configure the splash screen with [[https://github.com/emacs-dashboard/emacs-dash
 ;; TODO: Configure dashboard package
 ;; Temporarily disable splash screen
 (setq inhibit-startup-message t)
-#+end_src
-
-Clean up some stuff:
-
-#+begin_src elisp :tangle init.el
-(tooltip-mode -1)
-(tool-bar-mode -1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
-#+end_src
-
-Display line numbers:
-
-#+begin_src elisp :tangle init.el
-(use-package display-line-numbers
-  :hook ((prog-mode text-mode conf-mode) . display-line-numbers-mode))
 #+end_src
 
 Configure the [[https://github.com/catppuccin/emacs][catppuccin]] theme:
@@ -96,8 +96,8 @@ Configure the [[https://github.com/catppuccin/emacs][catppuccin]] theme:
 Configure fonts for fixed and variable pitch:
 
 #+begin_src elisp :tangle init.el
-(set-face-attribute 'default nil :font "Iosevka Nerd Font Mono")
-(set-face-attribute 'variable-pitch nil :font "Iosevka Etoile")
+(set-face-attribute 'default nil :font "Iosevka Nerd Font Mono" :height 150)
+(set-face-attribute 'variable-pitch nil :font "Iosevka Etoile" :height 150)
 #+end_src
 
 Configure font ligatures (Iosevka):

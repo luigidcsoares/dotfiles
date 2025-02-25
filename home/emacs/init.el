@@ -1,26 +1,19 @@
 (eval-when-compile (require 'use-package))
 
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
+(use-package display-line-numbers
+  :hook ((prog-mode text-mode conf-mode) . display-line-numbers-mode))
 
 ;; TODO: Configure dashboard package
 ;; Temporarily disable splash screen
 (setq inhibit-startup-message t)
-
-(tooltip-mode -1)
-(tool-bar-mode -1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
-
-(use-package display-line-numbers
-  :hook ((prog-mode text-mode conf-mode) . display-line-numbers-mode))
 
 (use-package catppuccin-theme
   :ensure t
   :custom (catppuccin-enlarge-headings nil)
   :config (load-theme 'catppuccin :no-confirm))
 
-(set-face-attribute 'default nil :font "Iosevka Nerd Font Mono")
-(set-face-attribute 'variable-pitch nil :font "Iosevka Etoile")
+(set-face-attribute 'default nil :font "Iosevka Nerd Font Mono" :height 150)
+(set-face-attribute 'variable-pitch nil :font "Iosevka Etoile" :height 150)
 
 (use-package ligature
   :ensure t

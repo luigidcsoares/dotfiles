@@ -8,7 +8,7 @@
 
   gtk = {
     enable = true;
-    catppuccin.enable = true;
+    # catppuccin.enable = true;
   };
 
   fonts.fontconfig = {
@@ -29,10 +29,10 @@
     })
   ];
 
-  home.sessionVariables = {
-    GDK_SCALE = "1.5";
-    GDK_DPI_SCALE = "1.5";
-    GTK_SCALE = "1.5";
-    QT_SCALE_FACTOR = "1.5";
-  };
+  # home.sessionVariables = {
+  #   GDK_SCALE = "1.5";
+  #   GDK_DPI_SCALE = "1.5";
+  #   GTK_SCALE = "1.5";
+  #   QT_SCALE_FACTOR = "1.5";
+  # };
 }
