@@ -4,7 +4,7 @@
 Here we enable and customize zsh as our shell, including
 
 - [[https://ohmyz.sh/][Oh My Zsh]] framework
-- [[https://github.com/romkatv/powerlevel10k][Powerlevel10k]] theme (perhaps try starship?)
+- [[https://github.com/starship/starship?tab=readme-ov-file][Startship]] prompt
 - Some aliases
 
 #+begin_src nix :tangle default.nix
@@ -18,18 +18,6 @@ Here we enable and customize zsh as our shell, including
       enable = true;
       plugins = [ "git" "fzf" ];
     };
-    plugins = [
-      {
-        name = "powerlevel10k";
-        file = "powerlevel10k.zsh-theme";
-        src = "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k";
-      }
-      {
-        name = "powerlevel10k-config";
-        file = "p10k.zsh";
-        src = ./zsh;
-      }
-    ];
     initExtra = ''
         ${builtins.readFile (rootPath + "/scripts/nixos.sh")}
         ${builtins.readFile (rootPath + "/scripts/wsl.sh")}
@@ -39,6 +27,11 @@ Here we enable and customize zsh as our shell, including
       rmr = "rm -ir";
       rmrf = "rm -irf";
     };
+  };
+
+  programs.starship = {
+    enable = true;
+    enableZshIntegration = true;
   };
 }
 #+end_src

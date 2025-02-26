@@ -21,7 +21,6 @@ let
   };
 in
 {
-  # services.emacs.enable = true;
   programs.emacs = {
     enable = true;
     package = pkgs.emacs-pgtk;
@@ -67,6 +66,40 @@ We are going to use [[https://github.com/jwiegley/use-package][use-package]] to 
 
 (push '(fullscreen . maximized) default-frame-alist)
 (push '(undecorated . t) default-frame-alist)
+#+end_src
+
+Set up [[https://github.com/mclear-tools/tabspaces][tabspaces]] so that we can have workspaces per tab, and configure consult (see[[#search-and-completion][ search & completion section]])
+
+#+begin_src elisp :tangle init.el
+(use-package tabspaces
+  :ensure t
+  :hook (after-init . tabspaces-mode)
+  :custom
+  (tabspaces-initialize-project-with-todo nil)
+  (tabspaces-session t)
+  (tabspaces-session-auto-restore t))
+
+(use-package consult-with-tabspaces
+  :no-require t
+  :after (tabspaces consult)
+  :config
+  ;; Hide full buffer list (still available with "b" prefix)
+  (consult-customize consult--source-buffer :hidden t :default nil)
+  ;; Set consult-workspace buffer list
+  (defvar consult--source-workspace
+    (list :name     "Workspace Buffers"
+          :narrow   ?w
+          :history  'buffer-name-history
+          :category 'buffer
+          :state    #'consult--buffer-state
+          :default  t
+          :items    (lambda () (consult--buffer-query
+				:predicate #'tabspaces--local-buffer-p
+				:sort 'visibility
+				:as #'buffer-name)))
+
+    "Set workspace buffer list for consult-buffer.")
+  (add-to-list 'consult-buffer-sources 'consult--source-workspace))
 #+end_src
 
 Display line numbers:
@@ -418,6 +451,9 @@ Install and config PDF tools:
 #+end_src
 
 ** Search and Completion
+:PROPERTIES:
+:CUSTOM_ID: search-and-completion
+:END:
 
 Install [[https://github.com/minad/vertico][vertico]] for vertical completion UI:
 
@@ -488,13 +524,15 @@ Install [[https://github.com/oantolin/embark][embark and embark-consult]] to act
 
 ** Shell/Terminal
 
-Ideally I would use eshell, but it requires some effort to copy my zsh aliases. So, let's try this [[https://github.com/riscy/shx-for-emacs][shx]] package:
+Ideally I would use eshell, but it requires some effort to copy my zsh aliases. A nice alternative is the [[https://github.com/riscy/shx-for-emacs][shx]] package, but since shell is a dumb terminal, I can't get starship working. Thus, for the moment I'll give [[https://codeberg.org/akib/emacs-eat][eat]] a try:
 
 #+begin_src elisp :tangle init.el
-(use-package shx :ensure t :config (shx-global-mode 1))
+(use-package eat
+  :ensure t
+  :bind ("C-c t" . eat))
 #+end_src
 
-Whenever possible, though, I'd like to just rely on (async-) shell-command. Let's configure it so that aliases are available:
+Whenever possible, though, I'd like to just rely on (async-) shell-command. Let's configure it so that aliases and other stuff are available:
 
 #+begin_src elisp :tangle init.el
 (setq shell-command-switch "-ic")
