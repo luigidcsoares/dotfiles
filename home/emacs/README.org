@@ -68,38 +68,52 @@ We are going to use [[https://github.com/jwiegley/use-package][use-package]] to 
 (push '(undecorated . t) default-frame-alist)
 #+end_src
 
-Set up [[https://github.com/mclear-tools/tabspaces][tabspaces]] so that we can have workspaces per tab, and configure consult (see[[#search-and-completion][ search & completion section]])
+Set up [[https://github.com/alphapapa/activities.el][activities]] so that we can have workspaces per tab, and configure consult (see[[#search-and-completion][ search & completion section]])
 
 #+begin_src elisp :tangle init.el
-(use-package tabspaces
+(use-package activities
   :ensure t
-  :hook (after-init . tabspaces-mode)
-  :custom
-  (tabspaces-initialize-project-with-todo nil)
-  (tabspaces-session t)
-  (tabspaces-session-auto-restore t))
+  :hook (after-init . activities-mode)
+  :bind
+  (("C-c a n" . activities-new)
+   ("C-c a d" . activities-define)
+   ("C-c a a" . activities-resume)
+   ("C-c a s" . activities-suspend)
+   ("C-c a k" . activities-kill)
+   ("C-c a RET" . activities-switch)
+   ("C-c a b" . activities-switch-buffer)
+   ("C-c a g" . activities-revert)
+   ("C-c a l" . activities-list)))
 
-(use-package consult-with-tabspaces
+(use-package activities-tabs :hook (after-init . activities-tabs-mode))
+(use-package activities-list)
+
+(use-package consult-with-activities
   :no-require t
-  :after (tabspaces consult)
+  :after (activities activities-tabs consult)
   :config
-  ;; Hide full buffer list (still available with "b" prefix)
-  (consult-customize consult--source-buffer :hidden t :default nil)
-  ;; Set consult-workspace buffer list
-  (defvar consult--source-workspace
-    (list :name     "Workspace Buffers"
-          :narrow   ?w
-          :history  'buffer-name-history
-          :category 'buffer
-          :state    #'consult--buffer-state
-          :default  t
-          :items    (lambda () (consult--buffer-query
-				:predicate #'tabspaces--local-buffer-p
+  ;; Type `a` to show only buffers related to current activity, if any:
+  (defun my/activities-local-buffer-p (buffer)
+    "Returns non-nil if BUFFER is present in `activities-current'."
+    (when (activities-current)
+      (memq buffer (activities-tabs--tab-parameter
+		    'activities-buffer-list
+		    (activities-tabs--tab (activities-current))))))
+
+  (defvar my/consult--source-activities-buffer
+    `(:name "Activities Buffers"
+            :narrow   ?a
+            :category buffer
+            :face     consult-buffer
+            :history  buffer-name-history
+            :state    ,#'consult--buffer-state
+            :items ,(lambda () (consult--buffer-query
+				:predicate #'my/activities-local-buffer-p
 				:sort 'visibility
 				:as #'buffer-name)))
-
-    "Set workspace buffer list for consult-buffer.")
-  (add-to-list 'consult-buffer-sources 'consult--source-workspace))
+    "Activities local buffers candidate source for `consult-buffer'.")
+  
+  (add-to-list 'consult-buffer-sources 'my/consult--source-activities-buffer))
 #+end_src
 
 Display line numbers:
