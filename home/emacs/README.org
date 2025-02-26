@@ -1,7 +1,9 @@
 #+title: Emacs Configuration
 #+author: Luigi D. C. Soares
 
-Here we set up the emacs package and configuration. First, let's install it. The idea is that we are going to use [[https://github.com/nix-community/emacs-overlay][emacs-overlay]]'s ~emacsWithPackagesFromUsePackage~ to handle packages. However, home-manager does not play nicely with it, so we are going to set up by hand what ~emacsWithPackagesFromUsePackage~ does (albeit simplified), using ~parsePackagesFromUsePackage~ function to fetch the list of packages to be installed:
+Here we set up the emacs package and configuration. First, let's install it. The idea is that we are going to use [[https://github.com/nix-community/emacs-overlay][emacs-overlay]]'s ~emacsWithPackagesFromUsePackage~ to handle packages. However, home-manager does not play nicely with it, so we are going to set up by hand what ~emacsWithPackagesFromUsePackage~ does (albeit simplified), using ~parsePackagesFromUsePackage~ function to fetch the list of packages to be installed.
+
+The ultimate goal is to use emacs daemon, but initialising it through systemd is messing with $PATH variable inside emacs. As a hacky workaround, we enable the service with graphical user session. This causes it to actually not activate, and the daemon is then started via emacsclient's --alternate-editor (-a) option.
 
 #+begin_src nix :tangle default.nix
 { emacs-overlay, ... }:
