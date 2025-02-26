@@ -15,6 +15,15 @@ let
   };
 in
 {
+  services.emacs = {
+    enable = true;
+    startWithUserSession = "graphical";
+    client = {
+      enable = true;
+      arguments = [ "-c" "-a= " ];
+    };
+  };
+  
   programs.emacs = {
     enable = true;
     package = pkgs.emacs-pgtk;
