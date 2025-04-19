@@ -20,12 +20,16 @@ Let's start by installing Neovim, along with all plugins:
       pkgs.vimPlugins.telescope-fzf-native-nvim
       pkgs.vimPlugins.toggleterm-nvim
 
-      pkgs.vimPlugins.nvim-lspconfig
-      pkgs.vimPlugins.nvim-treesitter.withAllGrammars
-
       pkgs.vimPlugins.orgmode
       pkgs.vimPlugins.vimtex
       
+      pkgs.vimPlugins.nvim-cmp
+      pkgs.vimPlugins.cmp-buffer
+      pkgs.vimPlugins.cmp-vimtex
+
+      pkgs.vimPlugins.nvim-lspconfig
+      pkgs.vimPlugins.nvim-treesitter.withAllGrammars
+
       (pkgs.vimUtils.buildVimPlugin {
         name = "wezterm";
         src = pkgs.fetchFromGitHub {
@@ -205,7 +209,7 @@ Let's start by installing Neovim, along with all plugins:
   require("orgmode").setup({})
   #+end_src
  
-  Configure LaTeX (vimtex):
+  Configure LaTeX ([[https://github.com/lervag/vimtex/][vimtex]]):
 
   - Fix the path to neovim (nix only)
   - Define Sioyek as the default PDF viewer
@@ -213,4 +217,51 @@ Let's start by installing Neovim, along with all plugins:
   #+begin_src lua :tangle init.lua
   vim.g.vimtex_callback_progpath = vim.fn.system("which nvim")
   vim.g.vimtex_view_method = "sioyek"
+  #+end_src
+
+  Install and configure [[https://github.com/hrsh7th/nvim-cmp][nvim-cmp]] for autocompletion, with sources:
+  - [[https://github.com/hrsh7th/cmp-buffer][cmp-buffer]] for buffer words
+  - [[https://github.com/micangl/cmp-vimtex][cmp-vimtex]] for vimtex's omnifunc
+  - Config tab so that we can complete once there is only one entry, or cycle through the options
+    (see [[https://github.com/hrsh7th/nvim-cmp/wiki/Example-mappings#confirm-candidate-on-tab-immediately-when-theres-only-one-completion-entry][wiki]])
+
+  #+begin_src lua :tangle init.lua
+  local has_words_before = function()
+    unpack = unpack or table.unpack
+    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+  end
+
+  local cmp = require("cmp")
+  cmp.setup({
+    -- global configuration goes here
+    mapping = {
+      ['<Tab>'] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          if #cmp.get_entries() == 1 then
+            cmp.confirm({ select = true })
+          else
+            cmp.select_next_item()
+          end
+          -- Replace with your snippet engine
+          -- elseif snippy.can_expand_or_advance() then
+          -- snippy.expand_or_advance()
+        elseif has_words_before() then
+          cmp.complete()
+          if #cmp.get_entries() == 1 then
+            cmp.confirm({ select = true })
+          end
+        else
+          fallback()
+        end
+      end, { "i", "s" }),
+    },
+    sources = {
+      { name = "buffer" },
+    },
+  })
+
+  cmp.setup.filetype("tex", {
+    sources = { { name = "vimtex" } },
+  })
   #+end_src

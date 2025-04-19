@@ -105,7 +105,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 require("toggleterm").setup({
  open_mapping = "<Leader>tt",
  insert_mappings = false,
- -- terminal_mappings = false,
+ terminal_mappings = false,
  start_in_insert = true,
  hide_numbers = true,
  direction = "float"
@@ -123,3 +123,42 @@ require("orgmode").setup({})
 
 vim.g.vimtex_callback_progpath = vim.fn.system("which nvim")
 vim.g.vimtex_view_method = "sioyek"
+
+local has_words_before = function()
+  unpack = unpack or table.unpack
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+end
+
+local cmp = require("cmp")
+cmp.setup({
+  -- global configuration goes here
+  mapping = {
+    ['<Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        if #cmp.get_entries() == 1 then
+          cmp.confirm({ select = true })
+        else
+          cmp.select_next_item()
+        end
+        -- Replace with your snippet engine
+        -- elseif snippy.can_expand_or_advance() then
+        -- snippy.expand_or_advance()
+      elseif has_words_before() then
+        cmp.complete()
+        if #cmp.get_entries() == 1 then
+          cmp.confirm({ select = true })
+        end
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+  },
+  sources = {
+    { name = "buffer" },
+  },
+})
+
+cmp.setup.filetype("tex", {
+  sources = { { name = "vimtex" } },
+})

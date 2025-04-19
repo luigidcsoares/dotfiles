@@ -14,12 +14,16 @@
       pkgs.vimPlugins.telescope-fzf-native-nvim
       pkgs.vimPlugins.toggleterm-nvim
 
-      pkgs.vimPlugins.nvim-lspconfig
-      pkgs.vimPlugins.nvim-treesitter.withAllGrammars
-
       pkgs.vimPlugins.orgmode
       pkgs.vimPlugins.vimtex
       
+      pkgs.vimPlugins.nvim-cmp
+      pkgs.vimPlugins.cmp-buffer
+      pkgs.vimPlugins.cmp-vimtex
+
+      pkgs.vimPlugins.nvim-lspconfig
+      pkgs.vimPlugins.nvim-treesitter.withAllGrammars
+
       (pkgs.vimUtils.buildVimPlugin {
         name = "wezterm";
         src = pkgs.fetchFromGitHub {
