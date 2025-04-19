@@ -7,10 +7,26 @@
   programs.fzf.enable = true;
   programs.ripgrep.enable = true;
 
+  programs.sioyek = {
+    enable = true;
+    config.startup_commands = ''
+      toggle_titlebar;toggle_custom_color
+    '';
+  };
+
   programs.git = {
     enable = true;
     userName = "Luigi D. C. Soares";
     userEmail = "dev@luigidcsoares.com";
+    aliases = {
+      cm = "commit";
+      cmsg = "commit -m";
+      cma = "commit --amend";
+      cman = "commit --amend --no-edit";
+      cmsga = "commit --amend -m";
+      last = "log -1 HEAD";
+      st = "status";
+    };
     extraConfig = {
       credential.helper = "${pkgs.pass-git-helper}/bin/pass-git-helper";
       init.defaultBranch = "main";
@@ -19,6 +35,9 @@
   };
   
   home.file.".config/pass-git-helper/git-pass-mapping.ini".text = ''
+    [github.com*]
+    target=dev/gpg/ssh
+
     [git.overleaf.com*]
     target=dev/overleaf
   '';

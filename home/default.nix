@@ -1,13 +1,11 @@
-{ catppuccin, emacs-overlay, username, rootPath, ... }:
+{ catppuccin, username, rootPath, ... }:
 { ... }: {
   imports = [
-    (import ./emacs { inherit emacs-overlay; })
     ./nvim
     (import ./security { inherit rootPath; })
     (import ./shell { inherit rootPath; })
     (import ./ui { inherit catppuccin; })
     ./tools
-    ./zathura
   ];
 
   home = {

@@ -1,10 +1,13 @@
-#+title: UI Configuration
+#+title: UI configuration
 #+author: Luigi D. C. Soares
 
 Here goes any aspect of the ui to be configure at the system level. For now, we only enable dconf:
 
 #+begin_src nix :tangle default.nix
-{ ... }: {
+{ pkgs, ... }: {
   programs.dconf.enable = true;
+
+  # For pinentry-gnome3
+  services.dbus.packages = [ pkgs.gcr ];
 }
 #+end_src

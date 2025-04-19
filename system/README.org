@@ -1,4 +1,4 @@
-#+title: System-Level Configuration
+#+title: System-level configuration
 #+author: Luigi D. C. Soares
 
 This module is structured as follows:
@@ -8,7 +8,9 @@ This module is structured as follows:
 - [[file:ui/][ui/]] sets up user-interface elements, such as fonts
 - [[file:wsl/][wsl/]] enables nixos wsl and set up some utilities
 
-These submodules are aggregated into [[file:default.nix][default.nix]], defined below. Remember to change the time zone as appropiate (TODO: how to automate this?).
+These submodules are aggregated into [[file:default.nix][default.nix]],
+defined below. Remember to change the time zone as appropiate 
+(TODO: how to automate this?).
 
 #+begin_src nix :tangle default.nix
 { username, ... }:

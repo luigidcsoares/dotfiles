@@ -1,16 +1,9 @@
 { pkgs, ... }: {
   programs.neovim = {
     enable = true;
-    defaultEditor = false;
+    defaultEditor = true;
     extraLuaConfig = builtins.readFile ./init.lua;
     plugins = [
-      # Dependency for neorg and telescope
-      pkgs.vimPlugins.plenary-nvim
-
-      # Dependencies for neorg
-      pkgs.vimPlugins.nvim-nio
-      pkgs.vimPlugins.nui-nvim
-
       pkgs.vimPlugins.catppuccin-nvim
       pkgs.vimPlugins.nvim-web-devicons
       pkgs.vimPlugins.lualine-nvim
@@ -18,13 +11,13 @@
       pkgs.vimPlugins.direnv-vim
       pkgs.vimPlugins.telescope-nvim
       pkgs.vimPlugins.telescope-file-browser-nvim
+      pkgs.vimPlugins.telescope-fzf-native-nvim
       pkgs.vimPlugins.toggleterm-nvim
 
       pkgs.vimPlugins.nvim-lspconfig
       pkgs.vimPlugins.nvim-treesitter.withAllGrammars
 
-      pkgs.vimPlugins.molten-nvim
-      pkgs.vimPlugins.neorg
+      pkgs.vimPlugins.orgmode
       pkgs.vimPlugins.vimtex
       
       (pkgs.vimUtils.buildVimPlugin {
@@ -38,16 +31,7 @@
       })
     ];
 
-    extraLuaPackages = luaPkgs: [
-      # Dependencies for neorg
-      luaPkgs.lua-utils-nvim
-      luaPkgs.pathlib-nvim
-    ];
-
-    extraPython3Packages = pythonPkgs: [
-      # Dependencies for molten
-      pythonPkgs.jupyter-client
-      pythonPkgs.pynvim
-    ];
+    extraLuaPackages = luaPkgs: [ ];
+    extraPython3Packages = pythonPkgs: [ ];
   };
 }

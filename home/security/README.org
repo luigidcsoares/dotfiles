@@ -1,4 +1,4 @@
-#+title: Security Configuration
+#+title: Security configuration
 #+author: Luigi D. C. Soares
 
 Here we set up security-related programs, namely:
@@ -23,7 +23,11 @@ Here we set up security-related programs, namely:
   services.gpg-agent = {
     enable = true;
     enableSshSupport = true;
-    pinentryPackage = pkgs.pinentry-qt;
+    sshKeys = builtins.split "\n" (builtins.readFile "${rootPath}/secrets/gpg_keys");
+    pinentryPackage = pkgs.pinentry-tty;
+    # extraConfig = ''
+    #   allow-loopback-pinentry
+    # '';
   };
 
   programs.password-store.enable = true;

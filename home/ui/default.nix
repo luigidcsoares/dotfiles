@@ -1,14 +1,15 @@
 { catppuccin, ... }:
 { config, pkgs, ... }: {
-  imports = [ catppuccin.homeManagerModules.catppuccin ];
+  imports = [ catppuccin.homeModules.catppuccin ];
   catppuccin = {
     enable = true;
-    flavor = "mocha";
+    flavor = "frappe";
   };
 
-  gtk = {
+  qt = {
     enable = true;
-    # catppuccin.enable = true;
+    platformTheme.name = "kvantum";
+    style.name = "kvantum";
   };
 
   fonts.fontconfig = {
@@ -24,15 +25,14 @@
   home.packages = [
     (pkgs.iosevka-bin.override { variant = "Aile"; })
     (pkgs.iosevka-bin.override { variant = "Etoile"; })
-    (pkgs.nerdfonts.override { 
-      fonts = [ "Iosevka" "NerdFontsSymbolsOnly" ]; 
-    })
+    pkgs.nerd-fonts.iosevka
+    pkgs.nerd-fonts.symbols-only
   ];
 
-  # home.sessionVariables = {
-  #   GDK_SCALE = "1.5";
-  #   GDK_DPI_SCALE = "1.5";
-  #   GTK_SCALE = "1.5";
-  #   QT_SCALE_FACTOR = "1.5";
-  # };
+  home.sessionVariables = {
+    GDK_SCALE = "1.5";
+    GDK_DPI_SCALE = "1.5";
+    GTK_SCALE = "1.5";
+    QT_SCALE_FACTOR = "1.5";
+  };
 }

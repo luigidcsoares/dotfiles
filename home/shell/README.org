@@ -1,4 +1,4 @@
-#+title: Shell Configuration
+#+title: Shell configuration
 #+author: Luigi D. C. Soares
 
 Here we enable and customize zsh as our shell, including
@@ -16,13 +16,14 @@ Here we enable and customize zsh as our shell, including
     enableCompletion = true;
     oh-my-zsh = {
       enable = true;
-      plugins = [ "git" "fzf" ];
+      plugins = [ "fzf" ];
     };
     initExtra = ''
         ${builtins.readFile (rootPath + "/scripts/nixos.sh")}
         ${builtins.readFile (rootPath + "/scripts/wsl.sh")}
     '';
     shellAliases = {
+      g = "git";
       rm = "rm -i"; 
       rmr = "rm -ir";
       rmrf = "rm -irf";

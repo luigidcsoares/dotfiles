@@ -1,30 +1,26 @@
-#+title: User-Level Configuration
+#+title: User-Level configuration
 #+author: Luigi D. C. Soares
 
 This module is structured as follows:
 
-- [[file:emacs/][emacs/]] sets up the emacs package and configuration
 - [[file:nvim/][nvim/]] sets up neovim (as a fallback editor; sometimes I switch betweem them)
 - [[file:security/][security]] sets up security-related programs (gpg, pass, ssh)
 - [[file:shell/][shell/]] sets up the user's shell (plugins, theme, aliases)
 - [[file:tools/][tools/]] sets up some useful tools
 - [[file:ui/][ui/]] sets up user-interface aspects
 - [[file:wezterm/][wezterm/]] holds my wezterm configuration
-- [[file:zathura/][zathura/]] sets up zathura pdf reader
 
 These submodules are aggregated into the following [[file:default.nix][default.nix]]:
 
 #+begin_src nix :tangle default.nix
-{ catppuccin, emacs-overlay, username, rootPath, ... }:
+{ catppuccin, username, rootPath, ... }:
 { ... }: {
   imports = [
-    (import ./emacs { inherit emacs-overlay; })
     ./nvim
     (import ./security { inherit rootPath; })
     (import ./shell { inherit rootPath; })
     (import ./ui { inherit catppuccin; })
     ./tools
-    ./zathura
   ];
 
   home = {

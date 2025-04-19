@@ -6,13 +6,14 @@
     enableCompletion = true;
     oh-my-zsh = {
       enable = true;
-      plugins = [ "git" "fzf" ];
+      plugins = [ "fzf" ];
     };
     initExtra = ''
         ${builtins.readFile (rootPath + "/scripts/nixos.sh")}
         ${builtins.readFile (rootPath + "/scripts/wsl.sh")}
     '';
     shellAliases = {
+      g = "git";
       rm = "rm -i"; 
       rmr = "rm -ir";
       rmrf = "rm -irf";

@@ -1,4 +1,4 @@
-#+title: Development Configuration
+#+title: Development configuration
 #+author: Luigi D. C. Soares
 
 Here we set up some development tools at system level:

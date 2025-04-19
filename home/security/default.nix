@@ -12,7 +12,11 @@
   services.gpg-agent = {
     enable = true;
     enableSshSupport = true;
-    pinentryPackage = pkgs.pinentry-qt;
+    sshKeys = builtins.split "\n" (builtins.readFile "${rootPath}/secrets/gpg_keys");
+    pinentryPackage = pkgs.pinentry-tty;
+    # extraConfig = ''
+    #   allow-loopback-pinentry
+    # '';
   };
 
   programs.password-store.enable = true;

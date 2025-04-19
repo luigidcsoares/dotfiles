@@ -12,14 +12,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     catppuccin.url = "github:catppuccin/nix";
-    emacs-overlay = {
-      url = "github:nix-community/emacs-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    neorg-overlay = {
-      url = "github:nvim-neorg/nixpkgs-neorg-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
   
   outputs =
@@ -29,8 +21,6 @@
       nixos-wsl,
       home-manager,
       catppuccin,
-      emacs-overlay,
-      neorg-overlay,
       ...
     }:
     let
@@ -46,15 +36,11 @@
             (import ./system { inherit username; })
             home-manager.nixosModules.home-manager
             {
-              nixpkgs.overlays = [
-                neorg-overlay.overlays.default
-                emacs-overlay.overlays.default
-              ];
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.users."${username}" = 
                 (import ./home {
-                  inherit catppuccin emacs-overlay username;
+                  inherit catppuccin username;
                   rootPath = self.outPath;
                 });
             }
@@ -89,31 +75,6 @@
           "python/jupyterlab" = {
             path = ./templates/python/jupyterlab;
             description = "Python template using Poetry2Nix (Jupyter Lab)";
-            welcomeText = ''
-            # Getting started
-
-            - Run `git init`
-            - Run `git add flake.nix pyproject.toml poetry.lock`
-            - Run `nix develop` to enter the development shell
-
-            # Adding/updating python packages
-
-            - Update pyproject.toml to add, remove, or update dependencies
-            - Run `poetry lock` (with `--no-update`, if you don't want to upgrade dependencies)
-            - Run `nix develop` to enter the development shell
-
-            # Optional
-
-            You may want to automate the last step with direnv:  
-
-            - Run `printf 'watch_file poetry.lock\nuse flake' > .envrc`  
-            - Run `direnv allow`
-          '';
-          };
-
-          "python/molten" = {
-            path = ./templates/python/molten;
-            description = "Python template using Poetry2Nix (Neovim with Molten)";
             welcomeText = ''
             # Getting started
 

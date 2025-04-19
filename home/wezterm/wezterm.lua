@@ -6,7 +6,7 @@ local config = wezterm.config_builder()
 --------------
 
 config.font = wezterm.font("IosevkaTerm Nerd Font")
-config.color_scheme = "Catppuccin Mocha"
+config.color_scheme = "Catppuccin Frappe"
 config.window_decorations = "INTEGRATED_BUTTONS | RESIZE"
 config.enable_tab_bar = false
 config.window_padding = {

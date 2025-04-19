@@ -1,4 +1,4 @@
-#+title: Shell Configuration
+#+title: Shell configuration
 #+author: Luigi D. C. Soares
 
 Here we set up the default shell:

@@ -1,4 +1,4 @@
-#+title: Tools Configuration
+#+title: Tools configuration
 #+author: Luigi D. C. Soares
 
 Here we set up some useful tools:
@@ -6,6 +6,8 @@ Here we set up some useful tools:
 - [[https://github.com/direnv/direnv][direnv]] with [[https://github.com/nix-community/nix-direnv][nix-direnv]], so we can use ~use_flake~ in our envrc's
 - [[https://github.com/junegunn/fzf][fzf]] and [[https://github.com/BurntSushi/ripgrep][ripgrep]] for search
 - git with [[https://github.com/languitar/pass-git-helper][pass-git-helper]] as the credential helper
+- Enable and customize [[https://github.com/ahrm/sioyek][Sioyek]] as the pdf reader, 
+  with [[https://github.com/catppuccin/Sioyek][catppuccin]] theme (Frappé):
 
 #+begin_src nix :tangle default.nix
 { pkgs, ... }: {
@@ -17,10 +19,26 @@ Here we set up some useful tools:
   programs.fzf.enable = true;
   programs.ripgrep.enable = true;
 
+  programs.sioyek = {
+    enable = true;
+    config.startup_commands = ''
+      toggle_titlebar;toggle_custom_color
+    '';
+  };
+
   programs.git = {
     enable = true;
     userName = "Luigi D. C. Soares";
     userEmail = "dev@luigidcsoares.com";
+    aliases = {
+      cm = "commit";
+      cmsg = "commit -m";
+      cma = "commit --amend";
+      cman = "commit --amend --no-edit";
+      cmsga = "commit --amend -m";
+      last = "log -1 HEAD";
+      st = "status";
+    };
     extraConfig = {
       credential.helper = "${pkgs.pass-git-helper}/bin/pass-git-helper";
       init.defaultBranch = "main";
@@ -29,6 +47,9 @@ Here we set up some useful tools:
   };
   
   home.file.".config/pass-git-helper/git-pass-mapping.ini".text = ''
+    [github.com*]
+    target=dev/gpg/ssh
+
     [git.overleaf.com*]
     target=dev/overleaf
   '';

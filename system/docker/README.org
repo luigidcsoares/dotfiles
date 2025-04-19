@@ -1,4 +1,4 @@
-#+title: Docker Configuration
+#+title: Docker configuration
 #+author: Luigi D. C. Soares
 
 Here we enable docker in [[https://docs.docker.com/engine/security/rootless/][rootless]] mode:
