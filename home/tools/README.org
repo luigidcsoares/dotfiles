@@ -22,7 +22,7 @@ Here we set up some useful tools:
   programs.sioyek = {
     enable = true;
     config.startup_commands = ''
-      toggle_titlebar;toggle_custom_color
+      toggle_custom_color
     '';
   };
 
