@@ -47,12 +47,18 @@ local telescope = require("telescope")
 local telescope_builtin = require("telescope.builtin")
 
 telescope.setup({
- extensions = {
-   file_browser = {
-     hijack_netrw = true,
-     hidden = true
-   }
- }
+  extensions = {
+    file_browser = {
+      hijack_netrw = true,
+      hidden = true
+    }
+  },
+  pickers = {
+    buffers = {
+      sort_lastused = true,
+      sort_mru = true
+    }
+  }
 })
 
 -- Telescope mappings
@@ -160,5 +166,8 @@ cmp.setup({
 })
 
 cmp.setup.filetype("tex", {
-  sources = { { name = "vimtex" } },
+  sources = { 
+    { name = "buffer" },
+    { name = "vimtex" },
+  },
 })
