@@ -108,27 +108,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
  end
 })
 
-require("toggleterm").setup({
- open_mapping = "<Leader>tt",
- insert_mappings = false,
- terminal_mappings = false,
- start_in_insert = true,
- hide_numbers = true,
- direction = "float"
+luasnip = require("luasnip")
+luasnip.setup({
+  enable_autosnippets = true,
+  store_selection_keys = "<Tab>"
 })
 
-function _G.set_terminal_keymaps()
- local opts = { buffer = 0 }
- vim.keymap.set("t", "<ESC>", [[<C-\><C-n>]], opts)
- vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], opts)
-end
-
-vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
-
-require("orgmode").setup({})
-
-vim.g.vimtex_callback_progpath = vim.fn.system("which nvim")
-vim.g.vimtex_view_method = "sioyek"
+require("luasnip.loaders.from_lua").load({
+  paths = "~/.config/nvim/snippets"
+})
 
 local has_words_before = function()
   unpack = unpack or table.unpack
@@ -138,18 +126,19 @@ end
 
 local cmp = require("cmp")
 cmp.setup({
-  -- global configuration goes here
+  snippets = {
+    expand = function(args) luasnip.lsp_expand(args.body) end
+  },
   mapping = {
-    ['<Tab>'] = cmp.mapping(function(fallback)
+    ["<Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         if #cmp.get_entries() == 1 then
           cmp.confirm({ select = true })
         else
           cmp.select_next_item()
         end
-        -- Replace with your snippet engine
-        -- elseif snippy.can_expand_or_advance() then
-        -- snippy.expand_or_advance()
+      elseif luasnip.locally_jumpable(1) then
+        luasnip.jump(1)
       elseif has_words_before() then
         cmp.complete()
         if #cmp.get_entries() == 1 then
@@ -171,3 +160,25 @@ cmp.setup.filetype("tex", {
     { name = "vimtex" },
   },
 })
+
+require("toggleterm").setup({
+ open_mapping = "<Leader>tt",
+ insert_mappings = false,
+ terminal_mappings = false,
+ start_in_insert = true,
+ hide_numbers = true,
+ direction = "float"
+})
+
+_G.set_terminal_keymaps = function()
+ local opts = { buffer = 0 }
+ vim.keymap.set("t", "<ESC>", [[<C-\><C-n>]], opts)
+ vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], opts)
+end
+
+vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
+
+require("orgmode").setup({})
+
+vim.g.vimtex_callback_progpath = vim.fn.system("which nvim")
+vim.g.vimtex_view_method = "sioyek"

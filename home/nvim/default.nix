@@ -1,4 +1,5 @@
 { pkgs, ... }: {
+  home.file.".config/nvim/snippets".source = ./snippets;
   programs.neovim = {
     enable = true;
     defaultEditor = true;
@@ -17,9 +18,11 @@
       pkgs.vimPlugins.orgmode
       pkgs.vimPlugins.vimtex
       
+      pkgs.vimPlugins.luasnip
       pkgs.vimPlugins.nvim-cmp
       pkgs.vimPlugins.cmp-buffer
       pkgs.vimPlugins.cmp-vimtex
+      pkgs.vimPlugins.cmp_luasnip
 
       pkgs.vimPlugins.nvim-lspconfig
       pkgs.vimPlugins.nvim-treesitter.withAllGrammars

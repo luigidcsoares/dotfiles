@@ -10,7 +10,7 @@
   programs.sioyek = {
     enable = true;
     config.startup_commands = ''
-      toggle_fullscreen;toggle_custom_color
+      toggle_custom_color
     '';
   };
 
