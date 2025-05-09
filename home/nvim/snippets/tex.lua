@@ -7,6 +7,16 @@ end
 
 local snippets = {}
 local autosnippets = {
+  -- Quotes (TODO: surround text in visual mode)
+  luasnip.s({
+    name = "quotes",
+    trig = [[""]],
+  }, luasnip_fmt.fmta(
+    "``<>''", {
+      luasnip.i(1)
+    }
+  )),
+  -- Sub and superscripts in math mode
   luasnip.s({
     name = "subscript",
     trig = "_(.)",
