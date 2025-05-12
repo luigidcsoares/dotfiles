@@ -33,11 +33,17 @@ vim.opt.inccommand = "split"
 vim.opt.number = true
 vim.opt.splitbelow = true
 vim.opt.splitright = true
-vim.opt.textwidth = 72
 vim.opt.termguicolors = true
 vim.opt.concealcursor = ""
 vim.opt.conceallevel = 2
 vim.opt.foldlevel = 99
+
+-- Use only soft wrap, and hard wrap manually
+vim.opt.textwidth = 72
+vim.opt.wrap = true
+vim.opt.formatoptions = "qnj" -- :h fo-table
+vim.opt.breakindent = true
+vim.opt.linebreak = true
 
 require("catppuccin").setup({ flavour = "frappe" })
 
@@ -178,7 +184,7 @@ end
 
 vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
 
-require("orgmode").setup({})
+require("orgmode").setup({ org_startup_indented = true })
 
 vim.g.vimtex_callback_progpath = vim.fn.system("which nvim")
 vim.g.vimtex_view_method = "sioyek"
