@@ -88,7 +88,7 @@ wsl-push() {
 }
 
 # Usage: wsl-publish src-file windows-subpath
-# where windows-subpath is a subpath inside your profile (e.g., inside C:/Users/username)
+# where windows-subpath is a subpath inside your profile (i.e., inside C:/Users/username)
 wsl-publish() {
     local src_path="$1"
     local src_file=$(basename $src_path)

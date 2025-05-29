@@ -5,7 +5,10 @@ local config = wezterm.config_builder()
 -- UI Config
 --------------
 
-config.font = wezterm.font("IosevkaTerm Nerd Font")
+config.font = wezterm.font_with_fallback({
+  "IosevkaTerm Nerd Font",
+  "JuliaMono",
+})
 config.color_scheme = "Catppuccin Frappe"
 config.window_decorations = "INTEGRATED_BUTTONS | RESIZE"
 config.enable_tab_bar = false
