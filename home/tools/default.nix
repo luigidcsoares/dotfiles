@@ -45,4 +45,9 @@
     [git.overleaf.com*]
     target=dev/overleaf
   '';
+
+  # Disable validation check because it is too slow (vpn?)
+  home.file.".config/wslu/conf".text = ''
+    WSLVIEW_SKIP_VALIDATION_CHECK=0
+  '';
 }

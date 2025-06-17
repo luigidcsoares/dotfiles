@@ -8,6 +8,7 @@ Here we set up some useful tools:
 - git with [[https://github.com/languitar/pass-git-helper][pass-git-helper]] as the credential helper
 - Enable and customize [[https://github.com/ahrm/sioyek][Sioyek]] as the pdf reader, 
   with [[https://github.com/catppuccin/Sioyek][catppuccin]] theme (Frappé):
+- Customise wslu because curl is too slow to validate url (vpn?) (discontinued; any alternative?)
 
 #+begin_src nix :tangle default.nix
 { pkgs, ... }: {
@@ -56,6 +57,11 @@ Here we set up some useful tools:
 
     [git.overleaf.com*]
     target=dev/overleaf
+  '';
+
+  # Disable validation check because it is too slow (vpn?)
+  home.file.".config/wslu/conf".text = ''
+    WSLVIEW_SKIP_VALIDATION_CHECK=0
   '';
 }
 #+end_src
