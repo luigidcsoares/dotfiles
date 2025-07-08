@@ -11,6 +11,21 @@ vim.opt.shiftwidth = 2
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Remap motion to deal with word wrap
+vim.keymap.set(
+  "n",
+  "k",
+  "v:count == 0 ? 'gk' : 'k'",
+  { expr = true, silent = true }
+)
+
+vim.keymap.set(
+  "n",
+  "j",
+  "v:count == 0 ? 'gj' : 'j'",
+  { expr = true, silent = true }
+)
+
 -- Sets up clipboard
 vim.opt.clipboard = "unnamedplus"
 vim.g.clipboard = {
