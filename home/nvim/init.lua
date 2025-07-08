@@ -146,7 +146,8 @@ cmp.setup({
     expand = function(args) luasnip.lsp_expand(args.body) end
   },
   mapping = {
-    ["<C-e>"] = cmp.mapping.close(),
+    ["<CR>"] = cmp.mapping.confirm({ select = false }),
+    ["<C-e>"] = cmp.mapping.abort(),
     ["<Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         if #cmp.get_entries() == 1 then
