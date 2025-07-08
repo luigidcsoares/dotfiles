@@ -1,8 +1,21 @@
 local luasnip = require("luasnip")
+local luasnip_extras = require("luasnip.extras")
 local luasnip_fmt = require("luasnip.extras.fmt")
 
 local in_mathzone = function()
   return vim.fn["vimtex#syntax#in_mathzone"]() == 1
+end
+
+
+-- Summary: When `LS_SELECT_RAW` is populated with a visual selection, the function
+-- returns an insert node whose initial text is set to the visual selection.
+-- When `LS_SELECT_RAW` is empty, the function simply returns an empty insert node.
+local get_visual = function(_, parent)
+  if (#parent.snippet.env.LS_SELECT_RAW > 0) then
+    return luasnip.sn(nil, luasnip.i(1, parent.snippet.env.LS_SELECT_RAW))
+  else -- If LS_SELECT_RAW is empty, return a blank insert node
+    return luasnip.sn(nil, luasnip.i(1))
+  end
 end
 
 local snippets = {}
@@ -40,7 +53,34 @@ local autosnippets = {
       luasnip.f(function(_, snip) return snip.captures[1] end),
       luasnip.i(1)
     }
-  ))
+  )),
+  -- Creating environments (although we can just ]] to close with vimtex)
+  luasnip.s({
+    name = "environment",
+    trig = [[\env]],
+  }, luasnip_fmt.fmta(
+    [[
+      \begin{<>}
+        <>
+      \end{<>}
+    ]], {
+      luasnip.i(1),
+      luasnip.d(2, get_visual),
+      luasnip_extras.rep(1),
+    }
+  )),
+  -- Surrounding text selected with visual
+  luasnip.s({
+    name = "surround",
+    trig = "([^{]*){",
+    trigEngine = "pattern",
+    wordTrig = false
+  }, luasnip_fmt.fmta(
+    "<>{<>}", {
+      luasnip.f(function(_, snip) return snip.captures[1] end),
+      luasnip.d(1, get_visual)
+    }
+  )),
 }
 
 return snippets, autosnippets

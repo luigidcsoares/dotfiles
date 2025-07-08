@@ -130,20 +130,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 luasnip = require("luasnip")
-luasnip.setup({
+luasnip.config.setup({
   enable_autosnippets = true,
-  store_selection_keys = "<Tab>"
+  store_selection_keys = "<localleader>s",
+  update_events = "TextChanged,TextChangedI"
 })
 
 require("luasnip.loaders.from_lua").load({
   paths = "~/.config/nvim/snippets"
 })
-
-local has_words_before = function()
-  unpack = unpack or table.unpack
-  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-end
 
 local cmp = require("cmp")
 cmp.setup({
@@ -151,6 +146,7 @@ cmp.setup({
     expand = function(args) luasnip.lsp_expand(args.body) end
   },
   mapping = {
+    ["<C-e>"] = cmp.mapping.close(),
     ["<Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         if #cmp.get_entries() == 1 then
@@ -160,11 +156,19 @@ cmp.setup({
         end
       elseif luasnip.locally_jumpable(1) then
         luasnip.jump(1)
-      elseif has_words_before() then
-        cmp.complete()
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+    ["<S-Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
         if #cmp.get_entries() == 1 then
           cmp.confirm({ select = true })
+        else
+          cmp.select_prev_item()
         end
+      elseif luasnip.locally_jumpable(-1) then
+        luasnip.jump(-1)
       else
         fallback()
       end
@@ -176,7 +180,7 @@ cmp.setup({
 })
 
 cmp.setup.filetype("tex", {
-  sources = { 
+  sources = {
     { name = "buffer" },
     { name = "vimtex" },
   },
