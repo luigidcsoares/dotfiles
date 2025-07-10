@@ -57,7 +57,7 @@ local autosnippets = {
   -- Creating environments (although we can just ]] to close with vimtex)
   luasnip.s({
     name = "environment",
-    trig = [[\env]],
+    trig = "\\env",
   }, luasnip_fmt.fmta(
     [[
       \begin{<>}
@@ -72,13 +72,27 @@ local autosnippets = {
   -- Surrounding text selected with visual
   luasnip.s({
     name = "surround",
-    trig = "([^{]*){",
+    -- This is used for:
+    -- * () and [], including things like \command(a)
+    -- * \command{} or just {}
+    -- * $$ and \[\] for math
+    trig = "([^%(%[{%$]*([%(%[{%$]))",
     trigEngine = "pattern",
     wordTrig = false
   }, luasnip_fmt.fmta(
-    "<>{<>}", {
+    "<><><>", {
       luasnip.f(function(_, snip) return snip.captures[1] end),
-      luasnip.d(1, get_visual)
+      luasnip.d(1, get_visual),
+      luasnip.f(function(_, snip)
+        local has_backslash = string.sub(snip.captures[1], -2, -1) == "\\["
+        local delim_map = {
+          ["("] = ")",
+          ["["] = has_backslash and "\\]" or "]",
+          ["{"] = "}",
+          ["$"] = "$"
+        }
+        return delim_map[snip.captures[2]]
+      end),
     }
   )),
 }
