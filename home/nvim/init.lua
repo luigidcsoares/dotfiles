@@ -99,19 +99,20 @@ vim.keymap.set(
 )
 
 require("nvim-treesitter.configs").setup({
- highlight = {
-   enable = true,
-   disable = { "latex" }
- },
- indent = { enable = true },
- incremental_selection = {
-   enable = true,
-   keymaps = {
-     node_incremental = "v",
-     node_decremental = "z",
-     scope_incremental = "<Tab>",
-   }
- }
+  highlight = {
+    enable = true,
+    disable = { "latex" }
+  },
+  indent = { enable = true },
+  incremental_selection = {
+    enable = true,
+    disable = { "latex" },
+    keymaps = {
+      node_incremental = "v",
+      node_decremental = "z",
+      scope_incremental = "<Tab>",
+    }
+  }
 })
 
 local lspconfig = require("lspconfig")
