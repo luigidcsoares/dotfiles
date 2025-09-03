@@ -106,7 +106,7 @@ require("nvim-treesitter.configs").setup({
   indent = { enable = true },
   incremental_selection = {
     enable = true,
-    disable = { "latex" },
+    disable = { "latex" }, -- Randomly crashes
     keymaps = {
       node_incremental = "v",
       node_decremental = "z",
@@ -121,13 +121,25 @@ lspconfig.lua_ls.setup({})
 lspconfig.nixd.setup({})
 lspconfig.pyright.setup({})
 
+-- Grammar checker with Harper
+lspconfig.harper_ls.setup({
+  filetypes = { "text" },
+  settings = {
+    ["harper_ls"] = {
+      linters = { SpellCheck = true },
+      dialect = "Australian"
+    }
+  }
+})
+
 vim.api.nvim_create_autocmd("LspAttach", {
- group = vim.api.nvim_create_augroup("UserLspConfig", {}),
- callback = function(ev)
-   local opts = { buffer = ev.buf }
-   vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-   vim.keymap.set("n", "<Leader>fmt", vim.lsp.buf.format, opts)
- end
+  group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+  callback = function(ev)
+    local opts = { buffer = ev.buf }
+    vim.keymap.set("n", "ca", vim.lsp.buf.code_action, opts)
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+    vim.keymap.set("n", "<Leader>fmt", vim.lsp.buf.format, opts)
+  end
 })
 
 luasnip = require("luasnip")

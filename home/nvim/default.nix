@@ -38,6 +38,7 @@
       })
     ];
 
+    extraPackages = [ pkgs.harper ];
     extraLuaPackages = luaPkgs: [ ];
     extraPython3Packages = pythonPkgs: [ ];
   };
