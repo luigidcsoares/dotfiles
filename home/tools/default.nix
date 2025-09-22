@@ -44,6 +44,9 @@
   home.file.".config/pass-git-helper/git-pass-mapping.ini".text = ''
     [github.com*]
     target=dev/gpg/ssh
+    
+    [gitlab.com*]
+    target=dev/gpg/ssh
 
     [git.overleaf.com*]
     target=dev/overleaf
