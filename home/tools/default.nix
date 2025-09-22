@@ -13,9 +13,12 @@
       "next_page" = "J";
       "previous_page" = "K";
     };
-    config.startup_commands = ''
-      toggle_custom_color
-    '';
+    config = {
+      "linear_filter" = "1";
+      "startup_commands" = ''
+        toggle_custom_color
+      '';
+    };
   };
 
   programs.git = {
