@@ -1,5 +1,5 @@
-{ username, ... }:
-{ pkgs, ... }: { 
+{ username, configRevision, ... }:
+{ pkgs, lib, ... }: { 
   imports = [ 
     ./dev
     ./docker
@@ -19,6 +19,8 @@
 
   # time.timeZone = "America/Sao_Paulo";
   time.timeZone = "Australia/Sydney";
+
+  system.configurationRevision = configRevision;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database

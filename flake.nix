@@ -1,6 +1,6 @@
 {
   description = "NixOS WSL Flake";
-  
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-wsl = {
@@ -13,7 +13,7 @@
     };
     catppuccin.url = "github:catppuccin/nix";
   };
-  
+
   outputs =
     {
       self,
@@ -28,37 +28,41 @@
       username = "luigidcsoares";
       pkgs = nixpkgs.legacyPackages.${system};
     in
-      {
-        nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-          inherit system;
-          modules = [
-            nixos-wsl.nixosModules.wsl
-            (import ./system { inherit username; })
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.users."${username}" = 
-                (import ./home {
-                  inherit catppuccin username;
-                  rootPath = self.outPath;
-                });
-            }
-          ];
-        };
+    {
+      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          nixos-wsl.nixosModules.wsl
+          (import ./system {
+            inherit username;
+            configRevision = self.rev or null;
+          })
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users."${username}" = (
+              import ./home {
+                inherit catppuccin username;
+                rootPath = self.outPath;
+              }
+            );
+          }
+        ];
+      };
 
-        devShells.${system}.default = pkgs.mkShell {
-          buildInputs = [
-            pkgs.git
-            pkgs.lua-language-server
-          ];
-        };
+      devShells.${system}.default = pkgs.mkShell {
+        buildInputs = [
+          pkgs.git
+          pkgs.lua-language-server
+        ];
+      };
 
-        templates = {
-          latex = {
-            path = ./templates/latex;
-            description = "Minimal LaTeX template";
-            welcomeText = ''
+      templates = {
+        latex = {
+          path = ./templates/latex;
+          description = "Minimal LaTeX template";
+          welcomeText = ''
             # Getting started
             - Add your latex packages into `texEnv` in `flake.nix`
             - Run `nix develop` to enter the environment
@@ -70,12 +74,12 @@
             - Ru `echo "use flake" > .envrc`  
             - Run `direnv allow`
           '';
-          };
+        };
 
-          "python/jupyterlab" = {
-            path = ./templates/python/jupyterlab;
-            description = "Python template using Poetry2Nix (Jupyter Lab)";
-            welcomeText = ''
+        "python/jupyterlab" = {
+          path = ./templates/python/jupyterlab;
+          description = "Python template using Poetry2Nix (Jupyter Lab)";
+          welcomeText = ''
             # Getting started
 
             - Run `git init`
@@ -95,7 +99,7 @@
             - Run `printf 'watch_file poetry.lock\nuse flake' > .envrc`  
             - Run `direnv allow`
           '';
-          };
         };
       };
+    };
 }
