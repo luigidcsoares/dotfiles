@@ -8,7 +8,7 @@
       enable = true;
       plugins = [ "fzf" ];
     };
-    initExtra = ''
+    initContent = ''
         ${builtins.readFile (rootPath + "/scripts/nixos.sh")}
         ${builtins.readFile (rootPath + "/scripts/wsl.sh")}
     '';

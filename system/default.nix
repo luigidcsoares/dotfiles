@@ -1,5 +1,5 @@
 { username, configRevision, ... }:
-{ pkgs, lib, ... }: { 
+{ pkgs, ... }: { 
   imports = [ 
     ./dev
     ./docker
@@ -17,8 +17,8 @@
   # WARNING: use this as a last resort, prefer to rely on nix.
   programs.nix-ld.enable = true;
 
-  # time.timeZone = "America/Sao_Paulo";
-  time.timeZone = "Australia/Sydney";
+  time.timeZone = "America/Sao_Paulo";
+  # time.timeZone = "Australia/Sydney";
 
   system.configurationRevision = configRevision;
 
