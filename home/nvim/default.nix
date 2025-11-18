@@ -13,7 +13,6 @@
       pkgs.vimPlugins.telescope-nvim
       pkgs.vimPlugins.telescope-file-browser-nvim
       pkgs.vimPlugins.telescope-fzf-native-nvim
-      pkgs.vimPlugins.toggleterm-nvim
 
       pkgs.vimPlugins.orgmode
       pkgs.vimPlugins.vimtex

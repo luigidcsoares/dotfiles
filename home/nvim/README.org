@@ -19,7 +19,6 @@ Let's start by installing Neovim, along with all plugins:
       pkgs.vimPlugins.telescope-nvim
       pkgs.vimPlugins.telescope-file-browser-nvim
       pkgs.vimPlugins.telescope-fzf-native-nvim
-      pkgs.vimPlugins.toggleterm-nvim
 
       pkgs.vimPlugins.orgmode
       pkgs.vimPlugins.vimtex
@@ -308,29 +307,6 @@ Let's start by installing Neovim, along with all plugins:
   })
   #+end_src
 
-  Configure toggleterm, so we can easily open and close terminals. A
-  simple alternative is to use ctrl-z + fg, but with toggleterm we get
-  terminals as neovim buffers, which is awesome.
- 
-  #+begin_src lua :tangle init.lua
-  require("toggleterm").setup({
-   open_mapping = "<Leader>tt",
-   insert_mappings = false,
-   terminal_mappings = false,
-   start_in_insert = true,
-   hide_numbers = true,
-   direction = "float"
-  })
-
-  _G.set_terminal_keymaps = function()
-   local opts = { buffer = 0 }
-   vim.keymap.set("t", "<ESC>", [[<C-\><C-n>]], opts)
-   vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], opts)
-  end
-
-  vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
-  #+end_src
- 
 * Languages
 
   Install and configure org-mode:

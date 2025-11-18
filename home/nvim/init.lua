@@ -213,23 +213,6 @@ cmp.setup.filetype("tex", {
   },
 })
 
-require("toggleterm").setup({
- open_mapping = "<Leader>tt",
- insert_mappings = false,
- terminal_mappings = false,
- start_in_insert = true,
- hide_numbers = true,
- direction = "float"
-})
-
-_G.set_terminal_keymaps = function()
- local opts = { buffer = 0 }
- vim.keymap.set("t", "<ESC>", [[<C-\><C-n>]], opts)
- vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], opts)
-end
-
-vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
-
 require("orgmode").setup({ org_startup_indented = true })
 
 vim.g.vimtex_callback_progpath = vim.fn.system("which nvim")
