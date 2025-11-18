@@ -68,6 +68,14 @@ config.keys = {
     action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" })
   },
 
+  -- Toggle pane zoom;
+  -- Example of usage: neovim zoomed with pane split vertical
+  {
+    key = "z",
+    mods = "LEADER",
+    action = wezterm.action.TogglePaneZoomState
+  },
+
   -- Move between panes
   {
     key = "h",
