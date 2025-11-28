@@ -3,7 +3,8 @@
   home.packages = [ pkgs.git-crypt ];
   programs.ssh = {
     enable = true;
-    addKeysToAgent = "yes";
+    enableDefaultConfig = false;
+    matchBlocks."*".addKeysToAgent = "yes";
     extraConfig = builtins.readFile "${rootPath}/secrets/ssh_config";
   };
 
@@ -13,7 +14,7 @@
     enable = true;
     enableSshSupport = true;
     sshKeys = builtins.split "\n" (builtins.readFile "${rootPath}/secrets/gpg_keys");
-    pinentryPackage = pkgs.pinentry-tty;
+    pinentry.package = pkgs.pinentry-tty;
     # extraConfig = ''
     #   allow-loopback-pinentry
     # '';

@@ -23,21 +23,21 @@
 
   programs.git = {
     enable = true;
-    userName = "Luigi D. C. Soares";
-    userEmail = "dev@luigidcsoares.com";
-    aliases = {
-      cm = "commit";
-      cmsg = "commit -m";
-      cma = "commit --amend";
-      cman = "commit --amend --no-edit";
-      cmsga = "commit --amend -m";
-      last = "log -1 HEAD";
-      st = "status";
-    };
-    extraConfig = {
+    settings = {
+      alias = {
+        cm = "commit";
+        cmsg = "commit -m";
+        cma = "commit --amend";
+        cman = "commit --amend --no-edit";
+        cmsga = "commit --amend -m";
+        last = "log -1 HEAD";
+        st = "status";
+      };
       credential.helper = "${pkgs.pass-git-helper}/bin/pass-git-helper";
       init.defaultBranch = "main";
       pull.rebase = true;
+      user.name = "Luigi D. C. Soares";
+      user.email = "dev@luigidcsoares.com";
     };
   };
   
