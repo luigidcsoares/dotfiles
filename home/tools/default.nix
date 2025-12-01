@@ -15,9 +15,7 @@
     };
     config = {
       "linear_filter" = "1";
-      "startup_commands" = ''
-        toggle_custom_color
-      '';
+      "startup_commands" = "toggle_custom_color toggle_synctex"; 
     };
   };
 

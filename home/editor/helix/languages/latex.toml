@@ -3,7 +3,17 @@ name = "latex"
 
 [language-server.texlab.config.texlab.build]
 onSave = true
+forwardSearchAfter = true
 executable = "latexmk"
+args = [
+  "-verbose",
+  "-file-line-error",
+  "-interaction=nonstopmode",
+  "-synctex=1",
+  "-shell-escape",
+  "-pv",
+  "%f"
+]
 
 [language-server.texlab.config.texlab.forwardSearch]
 executable = "sioyek"
@@ -13,9 +23,7 @@ args = [
   "toggle_synctex",
   "--inverse-search",
   "texlab inverse-search -i \"%%1\" -l %%2",
-  "--forward-search-file",
-  "%f",
-  "--forward-search-line",
-  "%l",
-  "%p",  
+  "--forward-search-file", "%f",
+  "--forward-search-line", "%l",
+  "%p"
 ]
