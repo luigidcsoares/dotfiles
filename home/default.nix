@@ -1,7 +1,7 @@
 { catppuccin, username, rootPath, ... }:
 { ... }: {
   imports = [
-    ./nvim
+    ./editor
     (import ./security { inherit rootPath; })
     (import ./shell { inherit rootPath; })
     (import ./ui { inherit catppuccin; })

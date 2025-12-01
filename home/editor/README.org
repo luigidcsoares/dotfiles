@@ -1,0 +1,5 @@
+#+begin_src nix :tangle default.nix
+{ ... }: {
+  imports = [./nvim];
+}
+#+end_src

@@ -3,7 +3,7 @@
 
 This module is structured as follows:
 
-- [[file:nvim/][nvim/]] sets up neovim (as a fallback editor; sometimes I switch betweem them)
+- [[file:editor/][editor/]] sets up some editors and define the main one
 - [[file:security/][security]] sets up security-related programs (gpg, pass, ssh)
 - [[file:shell/][shell/]] sets up the user's shell (plugins, theme, aliases)
 - [[file:tools/][tools/]] sets up some useful tools
@@ -16,7 +16,7 @@ These submodules are aggregated into the following [[file:default.nix][default.n
 { catppuccin, username, rootPath, ... }:
 { ... }: {
   imports = [
-    ./nvim
+    ./editor
     (import ./security { inherit rootPath; })
     (import ./shell { inherit rootPath; })
     (import ./ui { inherit catppuccin; })
