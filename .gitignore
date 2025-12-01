@@ -24,6 +24,7 @@
 !home/**/*.nix
 !home/**/*.org
 !home/**/*.zsh
+!home/editor/helix/**/*.toml
 
 # NixOS system configuration
 !system/

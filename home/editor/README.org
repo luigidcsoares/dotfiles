@@ -1,5 +1,8 @@
+#+title: Editor configuration
+#+author: Luigi D. C. Soares
+
 #+begin_src nix :tangle default.nix
 { ... }: {
-  imports = [./nvim];
+  imports = [ ./nvim ./helix ];
 }
 #+end_src

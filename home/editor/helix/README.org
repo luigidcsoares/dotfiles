@@ -1,0 +1,12 @@
+#+title: Helix configuration
+#+author: Luigi D. C. Soares
+
+#+begin_src nix :tangle default.nix
+{ ...  }: {
+  programs.helix = {
+    enable = true;
+    languages = builtins.fromTOML (builtins.readFile ./languages/latex.toml); 
+    settings = builtins.fromTOML (builtins.readFile ./config.toml);
+  };
+}
+#+end_src

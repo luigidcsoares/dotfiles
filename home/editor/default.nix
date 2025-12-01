@@ -1,3 +1,3 @@
 { ... }: {
-  imports = [./nvim];
+  imports = [ ./nvim ./helix ];
 }

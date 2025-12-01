@@ -1,0 +1,21 @@
+[[language]]
+name = "latex"
+
+[language-server.texlab.config.texlab.build]
+onSave = true
+executable = "latexmk"
+
+[language-server.texlab.config.texlab.forwardSearch]
+executable = "sioyek"
+args = [
+  "--reuse-window",
+  "--execute-command",
+  "toggle_synctex",
+  "--inverse-search",
+  "texlab inverse-search -i \"%%1\" -l %%2",
+  "--forward-search-file",
+  "%f",
+  "--forward-search-line",
+  "%l",
+  "%p",  
+]
