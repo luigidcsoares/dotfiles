@@ -115,22 +115,15 @@ require("nvim-treesitter.configs").setup({
   }
 })
 
-local lspconfig = require("lspconfig")
-
-lspconfig.lua_ls.setup({})
-lspconfig.nixd.setup({})
-lspconfig.pyright.setup({})
-
--- Grammar checker with Harper
-lspconfig.harper_ls.setup({
-  filetypes = { "text" },
-  settings = {
-    ["harper_ls"] = {
-      linters = { SpellCheck = true },
-      dialect = "Australian"
-    }
-  }
+vim.lsp.enable({
+  "lua_ls",
+  "nixd",
+  "pyright"
 })
+
+vim.lsp.config("lua_ls", {})
+vim.lsp.config("nixd", {})
+vim.lsp.config("pyright", {})
 
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("UserLspConfig", {}),
