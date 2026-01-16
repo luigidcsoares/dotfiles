@@ -1,13 +1,15 @@
 [[language]]
 name = "latex"
+indent = { tab-width = 2, unit = "  " }
 
 [language-server.texlab.config.texlab.build]
 onSave = true
-forwardSearchAfter = true
+# forwardSearchAfter = true
 executable = "latexmk"
 args = [
   "-verbose",
   "-file-line-error",
+  "-halt-on-error",
   "-interaction=nonstopmode",
   "-synctex=1",
   "-shell-escape",
