@@ -3,22 +3,23 @@
 
 Here goes any aspect of the ui to be configure at the system level. We
 
-- Set up the [[https://github.com/catppuccin/nix][catppuccin]] theme globally, including for gtk (*Warning*: this is deprecated)
 - Set up and install the default fonts, and configure font scaling
+- Set up catppuccin theme for GTK (deprecated, but...)
 
 #+begin_src nix :tangle default.nix
-{ catppuccin, ... }:
 { config, pkgs, ... }: {
-  imports = [ catppuccin.homeModules.catppuccin ];
-  catppuccin = {
-    enable = true;
-    flavor = "frappe";
-  };
+  home.packages = [
+    (pkgs.iosevka-bin.override { variant = "Aile"; })
+    (pkgs.iosevka-bin.override { variant = "Etoile"; })
+    pkgs.nerd-fonts.iosevka
+    pkgs.nerd-fonts.symbols-only
+  ];
 
-  qt = {
-    enable = true;
-    platformTheme.name = "kvantum";
-    style.name = "kvantum";
+  home.sessionVariables = {
+    GDK_SCALE = "2";
+    GDK_DPI_SCALE = "2";
+    GTK_SCALE = "2";
+    QT_SCALE_FACTOR = "2";
   };
 
   fonts.fontconfig = {
@@ -30,19 +31,22 @@ Here goes any aspect of the ui to be configure at the system level. We
       sansSerif = [ "Iosevka Aile" ];
     };
   };
-
-  home.packages = [
-    (pkgs.iosevka-bin.override { variant = "Aile"; })
-    (pkgs.iosevka-bin.override { variant = "Etoile"; })
-    pkgs.nerd-fonts.iosevka
-    pkgs.nerd-fonts.symbols-only
-  ];
-
-  home.sessionVariables = {
-    GDK_SCALE = "1.5";
-    GDK_DPI_SCALE = "1.5";
-    GTK_SCALE = "1.5";
-    QT_SCALE_FACTOR = "1.5";
+  
+  gtk = {
+    enable = true;
+    theme = {
+      package = pkgs.magnetic-catppuccin-gtk.override {
+        tweaks = [ "frappe" ];
+      };
+      name = "Catppuccin-GTK-Dark-Frappe";
+    };
   };
+  
+  qt = {
+    enable = true;
+    platformTheme.name = "kvantum";
+    style.name = "kvantum";
+  };
+
 }
 #+end_src

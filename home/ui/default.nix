@@ -1,15 +1,16 @@
-{ catppuccin, ... }:
 { config, pkgs, ... }: {
-  imports = [ catppuccin.homeModules.catppuccin ];
-  catppuccin = {
-    enable = true;
-    flavor = "frappe";
-  };
+  home.packages = [
+    (pkgs.iosevka-bin.override { variant = "Aile"; })
+    (pkgs.iosevka-bin.override { variant = "Etoile"; })
+    pkgs.nerd-fonts.iosevka
+    pkgs.nerd-fonts.symbols-only
+  ];
 
-  qt = {
-    enable = true;
-    platformTheme.name = "kvantum";
-    style.name = "kvantum";
+  home.sessionVariables = {
+    GDK_SCALE = "2";
+    GDK_DPI_SCALE = "2";
+    GTK_SCALE = "2";
+    QT_SCALE_FACTOR = "2";
   };
 
   fonts.fontconfig = {
@@ -21,18 +22,21 @@
       sansSerif = [ "Iosevka Aile" ];
     };
   };
-
-  home.packages = [
-    (pkgs.iosevka-bin.override { variant = "Aile"; })
-    (pkgs.iosevka-bin.override { variant = "Etoile"; })
-    pkgs.nerd-fonts.iosevka
-    pkgs.nerd-fonts.symbols-only
-  ];
-
-  home.sessionVariables = {
-    GDK_SCALE = "1.5";
-    GDK_DPI_SCALE = "1.5";
-    GTK_SCALE = "1.5";
-    QT_SCALE_FACTOR = "1.5";
+  
+  gtk = {
+    enable = true;
+    theme = {
+      package = pkgs.magnetic-catppuccin-gtk.override {
+        tweaks = [ "frappe" ];
+      };
+      name = "Catppuccin-GTK-Dark-Frappe";
+    };
   };
+  
+  qt = {
+    enable = true;
+    platformTheme.name = "kvantum";
+    style.name = "kvantum";
+  };
+
 }

@@ -7,6 +7,19 @@
   programs.fzf.enable = true;
   programs.ripgrep.enable = true;
 
+  programs.zathura = {
+    enable = true;
+    options = {
+      recolor-keephue = "true";
+      synctex = "true";
+      synctex-editor-command = "texlab inverse-search -i %{input} -l %{line}";
+    };
+  };
+  catppuccin.zathura = {
+    enable = true;
+    flavor = "frappe";
+  };
+
   programs.sioyek = {
     enable = true;
     bindings = {
@@ -17,6 +30,11 @@
       "linear_filter" = "1";
       "startup_commands" = "toggle_custom_color toggle_synctex"; 
     };
+  };
+
+  catppuccin.sioyek = {
+    enable = true;
+    flavor = "frappe";
   };
 
   programs.git = {

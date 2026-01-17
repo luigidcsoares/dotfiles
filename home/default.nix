@@ -1,10 +1,10 @@
-{ catppuccin, username, rootPath, ... }:
+{ username, rootPath, ... }:
 { ... }: {
   imports = [
     ./editor
     (import ./security { inherit rootPath; })
     (import ./shell { inherit rootPath; })
-    (import ./ui { inherit catppuccin; })
+    ./ui
     ./tools
   ];
 

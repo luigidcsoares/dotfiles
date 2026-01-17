@@ -41,12 +41,13 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users."${username}" = (
-              import ./home {
-                inherit catppuccin username;
+            home-manager.users."${username}".imports = [
+              catppuccin.homeModules.catppuccin
+              (import ./home {
+                inherit username;
                 rootPath = self.outPath;
-              }
-            );
+              })
+            ];
           }
         ];
       };

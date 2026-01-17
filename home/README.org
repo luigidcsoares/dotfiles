@@ -13,13 +13,13 @@ This module is structured as follows:
 These submodules are aggregated into the following [[file:default.nix][default.nix]]:
 
 #+begin_src nix :tangle default.nix
-{ catppuccin, username, rootPath, ... }:
+{ username, rootPath, ... }:
 { ... }: {
   imports = [
     ./editor
     (import ./security { inherit rootPath; })
     (import ./shell { inherit rootPath; })
-    (import ./ui { inherit catppuccin; })
+    ./ui
     ./tools
   ];
 
