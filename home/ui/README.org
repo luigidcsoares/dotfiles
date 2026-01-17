@@ -4,7 +4,7 @@
 Here goes any aspect of the ui to be configure at the system level. We
 
 - Set up and install the default fonts, and configure font scaling
-- Set up catppuccin theme for GTK (deprecated, but...)
+- Set up catppuccin theme for everything
 
 #+begin_src nix :tangle default.nix
 { config, pkgs, ... }: {
@@ -30,6 +30,11 @@ Here goes any aspect of the ui to be configure at the system level. We
       serif = [ "Iosevka Etoile" ];
       sansSerif = [ "Iosevka Aile" ];
     };
+  };
+
+  catppuccin = {
+    enable = true;
+    flavor = "frappe";
   };
   
   gtk = {

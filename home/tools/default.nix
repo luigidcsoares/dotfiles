@@ -15,10 +15,6 @@
       synctex-editor-command = "texlab inverse-search -i %{input} -l %{line}";
     };
   };
-  catppuccin.zathura = {
-    enable = true;
-    flavor = "frappe";
-  };
 
   programs.sioyek = {
     enable = true;
@@ -30,11 +26,6 @@
       "linear_filter" = "1";
       "startup_commands" = "toggle_custom_color toggle_synctex"; 
     };
-  };
-
-  catppuccin.sioyek = {
-    enable = true;
-    flavor = "frappe";
   };
 
   programs.git = {

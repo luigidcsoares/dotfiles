@@ -6,8 +6,7 @@ Here we set up some useful tools:
 - [[https://github.com/direnv/direnv][direnv]] with [[https://github.com/nix-community/nix-direnv][nix-direnv]], so we can use ~use_flake~ in our envrc's
 - [[https://github.com/junegunn/fzf][fzf]] and [[https://github.com/BurntSushi/ripgrep][ripgrep]] for search
 - git with [[https://github.com/languitar/pass-git-helper][pass-git-helper]] as the credential helper
-- Enable and customize [[https://github.com/ahrm/sioyek][Sioyek]] as the pdf reader, 
-  with [[https://github.com/catppuccin/Sioyek][catppuccin]] theme (Frappé):
+- Enable and customize zathura as the pdf reader (sioyek is an alternative)
 - Customise wslu because curl is too slow to validate url (vpn?) (discontinued; any alternative?)
 
 #+begin_src nix :tangle default.nix
@@ -28,10 +27,6 @@ Here we set up some useful tools:
       synctex-editor-command = "texlab inverse-search -i %{input} -l %{line}";
     };
   };
-  catppuccin.zathura = {
-    enable = true;
-    flavor = "frappe";
-  };
 
   programs.sioyek = {
     enable = true;
@@ -43,11 +38,6 @@ Here we set up some useful tools:
       "linear_filter" = "1";
       "startup_commands" = "toggle_custom_color toggle_synctex"; 
     };
-  };
-
-  catppuccin.sioyek = {
-    enable = true;
-    flavor = "frappe";
   };
 
   programs.git = {
