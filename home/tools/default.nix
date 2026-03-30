@@ -7,6 +7,11 @@
   programs.fzf.enable = true;
   programs.ripgrep.enable = true;
 
+  catppuccin.fzf = {
+    enable = true;
+    flavor = "frappe";
+  };
+
   programs.zathura = {
     enable = true;
     options = {
@@ -14,6 +19,11 @@
       synctex = "true";
       synctex-editor-command = "texlab inverse-search -i %{input} -l %{line}";
     };
+  };
+
+  catppuccin.zathura = {
+    enable = true;
+    flavor = "frappe";
   };
 
   programs.sioyek = {

@@ -7,10 +7,10 @@
   ];
 
   home.sessionVariables = {
-    GDK_SCALE = "2";
-    GDK_DPI_SCALE = "2";
-    GTK_SCALE = "2";
-    QT_SCALE_FACTOR = "2";
+    GDK_SCALE = "1.5";
+    GDK_DPI_SCALE = "1.5";
+    GTK_SCALE = "1.5";
+    QT_SCALE_FACTOR = "1.5";
   };
 
   fonts.fontconfig = {
