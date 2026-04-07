@@ -8,5 +8,6 @@ dialect = "Australian"
 [language-server.harper-ls.config.harper-ls.linters]
 DisjointPrefixes = false
 LongSentences = false
+NoFrenchSpaces = false
 OxfordComma = false
 Spaces = false
