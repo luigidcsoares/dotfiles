@@ -1,3 +1,6 @@
 { ... }: {
-  imports = [ ./nvim ./helix ];
+  imports = [
+    # ./nvim # TODO: fix issues
+    ./helix
+  ];
 }

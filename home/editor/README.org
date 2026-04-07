@@ -3,6 +3,9 @@
 
 #+begin_src nix :tangle default.nix
 { ... }: {
-  imports = [ ./nvim ./helix ];
+  imports = [
+    # ./nvim # TODO: fix issues
+    ./helix
+  ];
 }
 #+end_src

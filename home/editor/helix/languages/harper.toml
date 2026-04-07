@@ -1,0 +1,12 @@
+[language-server.harper-ls]
+command = "harper-ls"
+args = ["--stdio"]
+
+[language-server.harper-ls.config.harper-ls]
+dialect = "Australian"
+
+[language-server.harper-ls.config.harper-ls.linters]
+DisjointPrefixes = false
+LongSentences = false
+OxfordComma = false
+Spaces = false
