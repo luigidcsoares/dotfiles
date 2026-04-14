@@ -14,7 +14,7 @@
     enable = true;
     enableSshSupport = true;
     sshKeys = builtins.split "\n" (builtins.readFile "${rootPath}/secrets/gpg_keys");
-    pinentry.package = pkgs.pinentry-tty;
+    pinentry.package = pkgs.pinentry-gnome3;
     # extraConfig = ''
     #   allow-loopback-pinentry
     # '';
