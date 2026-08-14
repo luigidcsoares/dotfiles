@@ -34,7 +34,7 @@ Here goes any aspect of the ui to be configure at the system level. We
 
   catppuccin = {
     enable = true;
-    flavor = "frappe";
+    flavor = "latte";
   };
   
   gtk = {

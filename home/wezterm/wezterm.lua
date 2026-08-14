@@ -9,7 +9,7 @@ config.font = wezterm.font_with_fallback({
   "IosevkaTerm Nerd Font",
   "JuliaMono",
 })
-config.color_scheme = "Catppuccin Frappe"
+config.color_scheme = "Catppuccin Latte"
 config.window_decorations = "INTEGRATED_BUTTONS | RESIZE"
 config.enable_tab_bar = false
 config.window_padding = {

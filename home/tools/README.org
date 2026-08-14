@@ -21,7 +21,7 @@ Here we set up some useful tools:
 
   catppuccin.fzf = {
     enable = true;
-    flavor = "frappe";
+    flavor = "latte";
   };
 
   programs.zathura = {
@@ -35,7 +35,7 @@ Here we set up some useful tools:
 
   catppuccin.zathura = {
     enable = true;
-    flavor = "frappe";
+    flavor = "latte";
   };
 
   programs.sioyek = {

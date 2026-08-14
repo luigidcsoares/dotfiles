@@ -12,6 +12,6 @@
 
   catppuccin.helix = {
     enable = true;
-    flavor = "frappe";
+    flavor = "latte";
   };
 }

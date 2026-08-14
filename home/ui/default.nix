@@ -25,7 +25,7 @@
 
   catppuccin = {
     enable = true;
-    flavor = "frappe";
+    flavor = "latte";
   };
   
   gtk = {

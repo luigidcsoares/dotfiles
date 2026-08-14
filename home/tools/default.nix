@@ -9,7 +9,7 @@
 
   catppuccin.fzf = {
     enable = true;
-    flavor = "frappe";
+    flavor = "latte";
   };
 
   programs.zathura = {
@@ -23,7 +23,7 @@
 
   catppuccin.zathura = {
     enable = true;
-    flavor = "frappe";
+    flavor = "latte";
   };
 
   programs.sioyek = {
